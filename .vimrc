@@ -1,4 +1,3 @@
-/home/amund/.vimrc
 " ~/.vimrc
 "
 " When started as "evim", evim.vim will already have done these settings.

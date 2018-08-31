@@ -1,4 +1,5 @@
-/home/amund/.config/pulse/default.pa
+# ~/.config/pulse/default.pa
+
 # Include system defaults
 .include /etc/pulse/default.pa
 

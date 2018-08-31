@@ -1,5 +1,6 @@
-/home/amund/.xinitrc
-#!/bin/sh
+#! /bin/sh
+
+# ~/.xinitrc
 
 userresources=$HOME/.Xresources
 usermodmap=$HOME/.Xmodmap
