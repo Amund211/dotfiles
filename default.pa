@@ -1,0 +1,9 @@
+/home/amund/.config/pulse/default.pa
+# Include system defaults
+.include /etc/pulse/default.pa
+
+### Make some devices default
+#set-default-sink output
+#set-default-source input
+set-default-sink alsa_output.usb-AudioQuest_AudioQuest_DragonFly_Black_v1.5_AQDFBL0100102437-01.analog-stereo
+# alsa_output.usb-0d8c_C-Media_USB_Headphone_Set-00.analog-stereomodule-alsa-card.c
