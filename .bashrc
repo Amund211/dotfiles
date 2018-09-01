@@ -9,8 +9,8 @@ alias v='vim'
 alias vi='vim'
 # Logout of tty after starting x
 alias startx='exec startx'
-alias i3config=$EDITOR' ~/.dotfiles/i3'
-alias i3blocksconfig=$EDITOR' ~/.dotfiles/i3blocks'
+alias i3config='$EDITOR ~/.dotfiles/i3'
+alias i3blocksconfig='$EDITOR ~/.dotfiles/i3blocks'
 PS1='[\u@\h \W]\$ '
 
 cdls() {
