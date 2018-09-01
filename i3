@@ -37,7 +37,7 @@ font pango:monospace 8
 # Start i3bar to display a workspace bar (plus the system information i3blocks
 # finds out, if available)
 bar {
-        status_command i3blocks
+        status_command i3blocks -c ~/.dotfiles/i3blocks
 }
 
 # Setting bg-color
