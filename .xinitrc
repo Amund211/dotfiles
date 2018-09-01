@@ -2,8 +2,8 @@
 
 # ~/.xinitrc
 
-userresources=$HOME/.Xresources
-usermodmap=$HOME/.Xmodmap
+userresources=$HOME/.dotfiles/.Xresources
+usermodmap=$HOME/.dotfiles/.Xmodmap
 sysresources=/etc/X11/xinit/.Xresources
 sysmodmap=/etc/X11/xinit/.Xmodmap
 
@@ -57,4 +57,4 @@ fi
 # exec xterm -geometry 80x66+0+0 -name login
 
 # hopefully start i3 with X
-exec i3
+exec i3 -c ~/.dotfiles/i3
