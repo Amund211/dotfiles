@@ -2,7 +2,7 @@
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
-export PATH=$PATH:$HOME/.scripts
+export PATH=$PATH:$HOME/.scripts:$HOME/bin
 export EDITOR="vim"
 export VISUAL="vim"
 export TERMINAL="urxvt"
