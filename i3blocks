@@ -35,6 +35,8 @@ markup=none
 [week]
 label=WEEK
 interval=once
+signal=11
+# Placeholder signal to allow remote updating
 
 
 # Volume indicator
@@ -114,7 +116,7 @@ label=CPU
 interval=10
 min_width=CPU: 100.00%
 #separator=false
-#signal=11
+signal=11
 # Placeholder signal to allow remote updating
 
 [load_average]
@@ -137,8 +139,8 @@ signal=11
 #
 # The battery instance defaults to 0.
 [battery]
-#label=BAT
-label=⚡
+label=BAT
+#label=⚡
 #instance=1
 interval=30
 signal=11
