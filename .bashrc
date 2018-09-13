@@ -14,13 +14,13 @@ alias i3blocksconfig='$EDITOR ~/.dotfiles/i3blocks'
 PS1='[\u@\h \W]\$ '
 
 cdls() {
-	builtin cd $1
+	builtin cd "$1"
 	ls
 }
 alias cd='cdls'
 
 mkdirc() {
 	mkdir $@
-	cd $1
+	cd "$1"
 }
 
