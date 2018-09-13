@@ -66,3 +66,5 @@ augroup END
 " turning off compatible mode
 set nocp
 
+
+autocmd FileType python set omnifunc=python3complete#Complete

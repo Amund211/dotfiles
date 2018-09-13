@@ -14,8 +14,13 @@ alias i3blocksconfig='$EDITOR ~/.dotfiles/i3blocks'
 PS1='[\u@\h \W]\$ '
 
 cdls() {
-	builtin cd "$1"
-	ls
+	if [ $# -eq 0 ]
+	then
+		builtin cd
+	else
+		builtin cd "$@"
+	fi
+	[[ $? -eq 0 ]] && ls
 }
 alias cd='cdls'
 
@@ -24,3 +29,6 @@ mkdirc() {
 	cd "$1"
 }
 
+if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
+	exec startx
+fi
