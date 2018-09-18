@@ -2,6 +2,7 @@
 
 export PATH=$PATH:$HOME/.scripts:$HOME/bin
 export EDITOR="vim"
+export SUDO_EDITOR="vim"
 export VISUAL="vim"
 export TERMINAL="urxvt"
 export BROWSER="firefox"
