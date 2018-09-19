@@ -7,6 +7,7 @@
 
 URxvt.font: xft:monospace:size=10
 URxvt.scrollBar: false
+URxvr.letterSpace: -1
 
 
 URxvt*background: black
