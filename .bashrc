@@ -4,9 +4,12 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-alias ls='ls --color=auto -A --group-directories-first'
+alias ls='ls -A --color=auto --group-directories-first'
+alias grep='grep --color=auto'
 alias v='vim'
 alias vi='vim'
+alias p='sudo pacman'
+
 # Logout of tty after starting x
 alias startx='exec startx'
 alias i3config='$EDITOR ~/.dotfiles/i3'
