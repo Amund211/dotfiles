@@ -9,3 +9,9 @@ export BROWSER="firefox"
 export SCREENLOCKER="i3lock -e -c 000000"
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
+
+# exec startx on login on tty1
+if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
+	exec startx
+fi
+
