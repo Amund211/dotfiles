@@ -75,11 +75,11 @@ signal=11
 # The directory defaults to $HOME if the instance is not specified.
 # The script may be called with a optional argument to set the alert
 # (defaults to 10 for 10%).
-#[disk]
-#label=HOME
-#instance=/mnt/data
-#interval=30
-#signal=11
+[disk]
+label=/
+instance=/
+interval=once
+signal=11
 # Placeholder signal to allow remote updating
 
 # Network interface monitoring
