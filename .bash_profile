@@ -15,3 +15,6 @@ if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
 	exec startx
 fi
 
+# Swap caps and escape when in tty
+sudo -n loadkeys ~/.scripts/ttymaps.kmap 2>/dev/null
+
