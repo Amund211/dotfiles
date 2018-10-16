@@ -87,11 +87,6 @@ bindsym Control+F7 exec --no-startup-id "xdotool mousedown 3"
 # Blank the screen (brightness 0)
 bindsym XF86Display exec --no-startup-id "light -S 0"
 
-
-
-# start a terminal
-bindsym $mod+Return exec $terminal
-
 # Update all of i3blocks
 bindsym $mod+Insert exec --no-startup-id "~/.scripts/updateBlocks.sh"
 
@@ -120,15 +115,24 @@ bindsym XF86AudioMute exec --no-startup-id "pactl set-sink-mute @DEFAULT_SINK@ t
 # Utility bindings ############################################
 # Power-options
 bindsym $mod+Shift+p exec --no-startup-id "~/.scripts/poweroptions.sh '$screenlocker'"
+
 # Screen-options
 bindsym $mod+o exec --no-startup-id "~/.scripts/screensel.sh"
+
+# Sink-options
+bindsym $mod+XF86AudioRaiseVolume exec --no-startup-id "~/.scripts/sinksel.sh"
+bindsym $mod+XF86AudioLowerVolume exec --no-startup-id "~/.scripts/sourcesel.sh"
+
 # reload the configuration file
 bindsym $mod+Shift+c reload
+
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
+
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec  --no-startup-id "~/.scripts/prompt.sh 'Are you sure you want to exit i3?' 'i3-msg exit'"
 # "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
 # Restart NetworkManager
 bindsym $mod+Pause exec --no-startup-id "sudo systemctl restart NetworkManager"
 
@@ -146,6 +150,9 @@ bindsym $mod+t [instance="dropdownTerminal"] scratchpad show; [instance="dropdow
 
 # Show/hide dropdown python
 bindsym $mod+p [instance="dropdownPython"] scratchpad show; [instance="dropdownPython"] move position center
+
+# start a terminal
+bindsym $mod+Return exec $terminal
 
 # Run browser
 bindsym $mod+g exec $browser
