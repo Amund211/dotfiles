@@ -276,3 +276,15 @@ bindsym $mod+Shift+m move container to workspace next
 bindsym $mod+Shift+Prior move workspace to output up	# PgUp
 bindsym $mod+Shift+Next move workspace to output down	# PgDown
 
+# Defaulting workspaces to outputs
+workspace $ws1 output down
+workspace $ws2 output down
+workspace $ws3 output down
+workspace $ws4 output down
+workspace $ws5 output down
+workspace $ws6 output up
+workspace $ws7 output up
+workspace $ws8 output up
+workspace $ws9 output up
+workspace $ws0 output up
+
