@@ -279,14 +279,14 @@ bindsym $mod+Shift+Prior move workspace to output up
 bindsym $mod+Shift+Next move workspace to output down
 
 # Defaulting workspaces to outputs
-workspace $ws1 output down
-workspace $ws2 output down
-workspace $ws3 output down
-workspace $ws4 output down
-workspace $ws5 output down
-workspace $ws6 output up
-workspace $ws7 output up
-workspace $ws8 output up
-workspace $ws9 output up
-workspace $ws0 output up
+workspace $ws1 output LVDS1
+workspace $ws2 output LVDS1
+workspace $ws3 output LVDS1
+workspace $ws4 output LVDS1
+workspace $ws5 output LVDS1
+workspace $ws6 output HDMI1
+workspace $ws7 output HDMI1
+workspace $ws8 output HDMI1
+workspace $ws9 output HDMI1
+workspace $ws0 output HDMI1
 
