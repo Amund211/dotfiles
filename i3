@@ -290,3 +290,5 @@ workspace $ws8 output HDMI1
 workspace $ws9 output HDMI1
 workspace $ws0 output HDMI1
 
+# Start on $ws1
+exec --no-startup-id i3-msg "workspace $ws1"
