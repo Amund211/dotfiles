@@ -107,6 +107,9 @@ bindsym XF86AudioRaiseVolume exec --no-startup-id "pactl set-sink-volume @DEFAUL
 bindsym XF86AudioLowerVolume exec --no-startup-id "pactl set-sink-volume @DEFAULT_SINK@ -10% && pkill i3blocks -RTMIN+10"
 bindsym XF86AudioMute exec --no-startup-id "pactl set-sink-mute @DEFAULT_SINK@ toggle && pkill i3blocks -RTMIN+10"
 
+# Toggle touchpad
+bindsym XF86TouchpadToggle exec --no-startup-id "~/.scripts/toggletouchpad.sh"
+
 
 ###############################################################
 #			Letter key bindings
