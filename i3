@@ -58,6 +58,9 @@ exec --no-startup-id "xset r rate 300 35"
 # Selecting default screenlayout
 exec --no-startup-id "~/.screenlayout/default"
 
+# Start xbanish (hides mouse cursor)
+exec --no-startup-id "xbanish"
+
 
 ###############################################################
 #		       Window properties
