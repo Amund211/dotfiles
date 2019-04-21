@@ -11,7 +11,7 @@ floating_modifier $mod
 # Executable programs
 set $screenlocker i3lock -e -c 112233
 
-set $terminal --no-startup-id urxvt
+set $terminal --no-startup-id $TERMINAL
 
 set $browser firefox
 
@@ -158,7 +158,7 @@ bindsym $mod+p [instance="dropdownPython"] scratchpad show; [instance="dropdownP
 bindsym $mod+Return exec $terminal
 
 # Run browser
-bindsym $mod+g exec $browser
+bindsym $mod+g exec $BROWSER
 
 # Window bindings #############################################
 # change focus
