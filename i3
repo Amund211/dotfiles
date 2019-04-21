@@ -9,8 +9,6 @@ set $mod Mod4
 floating_modifier $mod
 
 # Executable programs
-set $screenlocker i3lock -e -c 112233
-
 set $terminal --no-startup-id $TERMINAL
 
 set $browser firefox
@@ -94,7 +92,7 @@ bindsym XF86Display exec --no-startup-id "light -S 0"
 bindsym $mod+Insert exec --no-startup-id "~/.scripts/updateBlocks.sh"
 
 # Screenlocking
-bindsym $mod+Shift+Delete exec --no-startup-id "$screenlocker"
+bindsym $mod+Shift+Delete exec --no-startup-id "$SCREENLOCKER"
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
@@ -117,7 +115,7 @@ bindsym XF86AudioMute exec --no-startup-id "pactl set-sink-mute @DEFAULT_SINK@ t
 
 # Utility bindings ############################################
 # Power-options
-bindsym $mod+Shift+p exec --no-startup-id "~/.scripts/poweroptions.sh '$screenlocker'"
+bindsym $mod+Shift+p exec --no-startup-id "~/.scripts/poweroptions.sh '$SCREENLOCKER'"
 
 # Screen-options
 bindsym $mod+o exec --no-startup-id "~/.scripts/screensel.sh"
