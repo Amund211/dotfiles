@@ -8,11 +8,6 @@ set $mod Mod4
 
 floating_modifier $mod
 
-# Executable programs
-set $terminal --no-startup-id $TERMINAL
-
-set $browser firefox
-
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 font pango:monospace 8
@@ -70,7 +65,7 @@ for_window [instance="dropdownTerminal"] resize set 625 400
 for_window [instance="dropdownTerminal"] move scratchpad
 for_window [instance="dropdownTerminal"] border pixel 5
 
-exec $terminal -name dropdownTerminal
+exec --no-startup-id $TERMINAL -name dropdownTerminal
 
 # Properties for python window
 for_window [instance="dropdownPython"] floating enable
@@ -78,7 +73,7 @@ for_window [instance="dropdownPython"] resize set 625 400
 for_window [instance="dropdownPython"] move scratchpad
 for_window [instance="dropdownPython"] border pixel 2
 
-exec $terminal -name dropdownPython -e python
+exec --no-startup-id $TERMINAL -name dropdownPython -e python
 ###############################################################
 #			Special bindings
 ###############################################################
@@ -153,7 +148,7 @@ bindsym $mod+t [instance="dropdownTerminal"] scratchpad show; [instance="dropdow
 bindsym $mod+p [instance="dropdownPython"] scratchpad show; [instance="dropdownPython"] move position center
 
 # start a terminal
-bindsym $mod+Return exec $terminal
+bindsym $mod+Return exec --no-startup-id $TERMINAL
 
 # Run browser
 bindsym $mod+g exec $BROWSER
