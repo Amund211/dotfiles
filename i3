@@ -54,6 +54,9 @@ exec --no-startup-id "~/.screenlayout/default"
 # Start xbanish (hides mouse cursor)
 exec --no-startup-id "xbanish"
 
+# Start machine specific init script
+exec --no-startup-id "~/.scripts/init.sh"
+
 
 ###############################################################
 #		       Window properties
