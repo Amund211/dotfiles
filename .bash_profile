@@ -7,6 +7,9 @@ export VISUAL="vim"
 export TERMINAL="urxvt"
 export BROWSER="firefox"
 
+# Disable less history
+export LESSHISTFILE="-"
+
 export SCREENLOCKER="i3lock -e -c 112233"
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
