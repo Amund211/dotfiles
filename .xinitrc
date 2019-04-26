@@ -56,5 +56,9 @@ fi
 # xterm -geometry 80x20+494-0 &
 # exec xterm -geometry 80x66+0+0 -name login
 
+# Setting the default screenlayout
+~/.screenlayout/default
+
 # hopefully start i3 with X
 exec i3 -c ~/.dotfiles/i3
+
