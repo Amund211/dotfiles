@@ -33,8 +33,8 @@ bar {
         status_command i3blocks -c ~/.dotfiles/i3blocks
 }
 
-# Setting bg-color
-exec --no-startup-id "xsetroot -solid \"#113322\""
+# Setting bg-image
+exec --no-startup-id "feh --bg-fill pics/bg.jpg --no-fehbg"
 
 # Set bg
 # exec_always --no-startup-id "feh --bg-scale ~/path/to/file"
@@ -294,3 +294,4 @@ workspace $ws0 output HDMI1
 
 # Start on $ws1
 exec --no-startup-id i3-msg "workspace $ws1"
+
