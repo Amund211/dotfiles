@@ -34,7 +34,7 @@ bar {
 }
 
 # Setting bg-image
-exec --no-startup-id "feh --bg-fill pics/bg.jpg --no-fehbg"
+exec --no-startup-id "feh --bg-fill ~/pics/bg.jpg --no-fehbg"
 
 # Set bg
 # exec_always --no-startup-id "feh --bg-scale ~/path/to/file"
