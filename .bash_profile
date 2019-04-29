@@ -10,6 +10,11 @@ export BROWSER="firefox"
 # Disable less history
 export LESSHISTFILE="-"
 
+# Unlimited bash history size, because why not
+export HISTSIZE=
+export HISTFILESIZE=
+export HISTTIMEFORMAT="[%F %T %z] "
+
 export SCREENLOCKER="i3lock -e -c 112233"
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
