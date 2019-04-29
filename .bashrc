@@ -4,6 +4,9 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+shopt -s histappend
+shopt -s no_empty_cmd_completion
+
 alias ls='ls -A --color=auto --group-directories-first'
 alias grep='grep --color=auto'
 alias v='vim'
