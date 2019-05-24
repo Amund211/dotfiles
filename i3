@@ -65,15 +65,12 @@ for_window [instance="dropdownTerminal"] resize set 625 400
 for_window [instance="dropdownTerminal"] move scratchpad
 for_window [instance="dropdownTerminal"] border pixel 5
 
-exec --no-startup-id $TERMINAL -name dropdownTerminal
-
 # Properties for python window
 for_window [instance="dropdownPython"] floating enable
 for_window [instance="dropdownPython"] resize set 625 400
 for_window [instance="dropdownPython"] move scratchpad
 for_window [instance="dropdownPython"] border pixel 2
 
-exec --no-startup-id $TERMINAL -name dropdownPython -e python
 ###############################################################
 #			Special bindings
 ###############################################################
@@ -145,10 +142,10 @@ bindsym $mod+d exec --no-startup-id dmenu_run
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
 # Show/hide dropdown terminal
-bindsym $mod+t [instance="dropdownTerminal"] scratchpad show; [instance="dropdownTerminal"] move position center
+bindsym $mod+t exec "[ $(i3-msg [instance='dropdownTerminal'] scratchpad show 2>/dev/null) = '[{\\"success\\":true}]' ] || $TERMINAL -name dropdownTerminal -e sh -c 'i3-msg [instance='dropdownTerminal'] focus; clear; $SHELL' &"
 
 # Show/hide dropdown python
-bindsym $mod+p [instance="dropdownPython"] scratchpad show; [instance="dropdownPython"] move position center
+bindsym $mod+p exec "[ $(i3-msg [instance='dropdownPython'] scratchpad show 2>/dev/null) = '[{\\"success\\":true}]' ] || $TERMINAL -name dropdownPython -e sh -c 'i3-msg [instance='dropdownPython'] focus; clear; python' &"
 
 # start a terminal
 bindsym $mod+Return exec --no-startup-id $TERMINAL
