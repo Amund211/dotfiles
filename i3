@@ -96,8 +96,8 @@ bindsym XF86MonBrightnessUp exec --no-startup-id "~/.scripts/brightness.sh 1"
 bindsym XF86MonBrightnessDown exec --no-startup-id "~/.scripts/brightness.sh -1"
 
 # Audio keys
-bindsym XF86AudioRaiseVolume exec --no-startup-id "pactl set-sink-volume @DEFAULT_SINK@ +10% && pactl set-sink-mute @DEFAULT_SINK@ 0 && pkill i3blocks -RTMIN+10"
-bindsym XF86AudioLowerVolume exec --no-startup-id "pactl set-sink-volume @DEFAULT_SINK@ -10% && pkill i3blocks -RTMIN+10"
+bindsym XF86AudioRaiseVolume exec --no-startup-id "pactl set-sink-volume @DEFAULT_SINK@ +3% && pactl set-sink-mute @DEFAULT_SINK@ 0 && pkill i3blocks -RTMIN+10"
+bindsym XF86AudioLowerVolume exec --no-startup-id "pactl set-sink-volume @DEFAULT_SINK@ -3% && pkill i3blocks -RTMIN+10"
 bindsym XF86AudioMute exec --no-startup-id "pactl set-sink-mute @DEFAULT_SINK@ toggle && pkill i3blocks -RTMIN+10"
 
 # Toggle touchpad
