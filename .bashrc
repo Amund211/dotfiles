@@ -9,6 +9,7 @@ shopt -s no_empty_cmd_completion
 
 alias ls='ls -A --color=auto --group-directories-first'
 alias grep='grep --color=auto'
+alias rm='rm -I'
 alias v='vim'
 alias vi='vim'
 alias p='sudo pacman'
