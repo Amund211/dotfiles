@@ -1,70 +1,82 @@
 " ~/.vimrc
 "
-" When started as "evim", evim.vim will already have done these settings.
-if v:progname =~? "evim"
-  finish
-endif
 
-" Get the defaults that most users want.
-source $VIMRUNTIME/defaults.vim
+" General
 
-if has("vms")
-  set nobackup		" do not keep a backup file, use versions instead
-else
-  set backup		" keep a backup file (restore to previous version)
-  if has('persistent_undo')
-    set undofile	" keep an undo file (undo changes after closing)
-  endif
-endif
+set nocompatible
 
-if &t_Co > 2 || has("gui_running")
-  " Switch on highlighting the last used search pattern.
-  set hlsearch
-endif
+set backspace=indent,eol,start
 
-" Only do this part when compiled with support for autocommands.
-if has("autocmd")
+set history=200		" keep 200 lines of command line history
+set ruler		" show the cursor position all the time
+set showcmd		" display incomplete commands
+set wildmenu		" display completion matches in a status line
 
-  " Put these in an autocmd group, so that we can delete them easily.
-  augroup vimrcEx
-  au!
+set backup		" keep a backup file (restore to previous version)
+set undofile	" keep an undo file (undo changes after closing)
 
-  " For all text files set 'textwidth' to 78 characters.
-  autocmd FileType text setlocal textwidth=78
 
-  augroup END
+" Aesthetics
 
-else
+" Allow using the mouse to position the cursor etc.
+set mouse=a
 
-  set autoindent		" always set autoindenting on
+" 5 lines of scrolloff
+set scrolloff=5
 
-endif " has("autocmd")
+" Show @@@ in the last line if it is truncated.
+set display=truncate
 
-" Add optional packages.
-"
-" The matchit plugin makes the % command work better, but it is not backwards
-" compatible.
-" The ! means the package won't be loaded right away but when plugins are
-" loaded during initialization.
-if has('syntax') && has('eval')
-  packadd! matchit
-endif
+set hlsearch
+set incsearch
 
-" Enable incremental search
-set is
+syntax on
 
 " Enable hybrid line numbers
 set relativenumber number
 
-" Toggling numbermodes
+" Switch to absolute linenumbers when in insertmode
 augroup numbertoggle
-	autocmd!
-	autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
-	autocmd Bufleave,FocusLost,InsertEnter * set norelativenumber
+  autocmd!
+  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
+  autocmd Bufleave,FocusLost,InsertEnter * set norelativenumber
 augroup END
 
-" turning off compatible mode
-set nocp
+augroup vimrcEx
+  au!
+  autocmd FileType text setlocal textwidth=78
+augroup END
+
+" The ! means the package won't be loaded right away but when plugins are
+" loaded during initialization.
+packadd! matchit
 
 
-autocmd FileType python set omnifunc=python3complete#Complete
+" Misc
+
+augroup vimStartup
+  au!
+
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it when the position is invalid, when inside an event handler
+  " (happens when dropping a file on gvim) and for a commit message (it's
+  " likely a different one than last time).
+  autocmd BufReadPost *
+    \ if line("'\"") >= 1 && line("'\"") <= line("$") && &ft !~# 'commit'
+    \ |   exe "normal! g`\""
+    \ | endif
+
+augroup END
+
+
+" Commands
+
+command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+		\ | wincmd p | diffthis
+
+
+" Mappings
+
+" Break undo so you can undo <C-U>
+inoremap <C-U> <C-G>u<C-U>
+
