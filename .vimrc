@@ -15,6 +15,8 @@ set wildmenu		" display completion matches in a status line
 set backup		" keep a backup file (restore to previous version)
 set undofile	" keep an undo file (undo changes after closing)
 
+filetype plugin indent on
+
 
 " Aesthetics
 
