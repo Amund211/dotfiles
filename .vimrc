@@ -15,6 +15,8 @@ set wildmenu		" display completion matches in a status line
 set backup		" keep a backup file (restore to previous version)
 set undofile	" keep an undo file (undo changes after closing)
 
+set ttimeoutlen=0	" wait up to 0ms after Esc for special key
+
 filetype plugin indent on
 
 
