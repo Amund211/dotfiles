@@ -1,5 +1,7 @@
 # ~/.bashrc
 
+alias pw='watch -n 1 ping -c 1 8.8.8.8'
+
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
