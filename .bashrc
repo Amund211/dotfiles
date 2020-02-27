@@ -18,6 +18,7 @@ alias v='vim'
 alias vi='vim'
 alias p='sudo pacman'
 alias trim='sudo fstrim -A'
+alias h='$TERMINAL & disown'
 
 # Logout of tty after starting x
 alias startx='exec startx'
