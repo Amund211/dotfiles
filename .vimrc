@@ -12,8 +12,26 @@ set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
 set wildmenu		" display completion matches in a status line
 
-set backup		" keep a backup file (restore to previous version)
+if !isdirectory($HOME."/.vim")
+    call mkdir($HOME."/.vim", "", 0770)
+endif
+
+if !isdirectory($HOME."/.vim/.undo")
+    call mkdir($HOME."/.vim/.undo", "", 0700)
+endif
+set undodir=~/.vim/.undo//
 set undofile	" keep an undo file (undo changes after closing)
+
+if !isdirectory($HOME."/.vim/.backup")
+    call mkdir($HOME."/.vim/.backup", "", 0700)
+endif
+set backup		" keep a backup file (restore to previous version)
+set backupdir=~/.vim/.backup//
+
+if !isdirectory($HOME."/.vim/.swap")
+    call mkdir($HOME."/.vim/.swap", "", 0700)
+endif
+set directory=~/.vim/.swap//
 
 set ttimeoutlen=0	" wait up to 0ms after Esc for special key
 
@@ -83,4 +101,3 @@ command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
 
 " Break undo so you can undo <C-U>
 inoremap <C-U> <C-G>u<C-U>
-
