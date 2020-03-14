@@ -9,6 +9,9 @@ alias pw='watch -n 1 ping -c 1 8.8.8.8'
 shopt -s histappend
 shopt -s no_empty_cmd_completion
 
+# Don't put duplicate lines or lines starting with a space in the history
+HISTCONTROL=ignoreboth
+
 alias ls='ls -A --color=auto --group-directories-first'
 alias grep='grep --color=auto'
 alias rm='rm -I'
