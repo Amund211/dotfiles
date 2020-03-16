@@ -1,8 +1,5 @@
 # ~/.bashrc
 
-alias pw='watch -n 1 ping -c 1 8.8.8.8'
-
-
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
@@ -22,6 +19,7 @@ alias vi='vim'
 alias p='sudo pacman'
 alias trim='sudo fstrim -A'
 alias h='$TERMINAL & disown'
+alias pw='watch -n 1 ping -c 1 8.8.8.8'
 
 # Logout of tty after starting x
 alias startx='exec startx'
