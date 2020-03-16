@@ -22,8 +22,8 @@ export SCREENLOCKER="i3lock -e -c 112233"
 # exec startx on login on tty1
 if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
 	exec startx
+else
+	# Swap caps and escape when in tty
+	sudo -n loadkeys ~/.scripts/ttymaps.kmap 2>/dev/null
 fi
-
-# Swap caps and escape when in tty
-sudo -n loadkeys ~/.scripts/ttymaps.kmap 2>/dev/null
 
