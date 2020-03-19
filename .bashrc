@@ -10,6 +10,7 @@ shopt -s no_empty_cmd_completion
 HISTCONTROL=ignoreboth
 
 alias ls='ls -A --color=auto --group-directories-first'
+alias ll='ls -l'
 alias grep='grep --color=auto'
 alias rm='rm -I'
 alias mv='mv --interactive'
