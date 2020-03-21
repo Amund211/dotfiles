@@ -21,6 +21,8 @@ alias p='sudo pacman'
 alias trim='sudo fstrim -A'
 alias h='$TERMINAL & disown'
 alias pw='watch -n 1 ping -c 1 8.8.8.8'
+alias clip='xclip -selection primary -o | xclip -selection clipboard'
+alias sel='xclip -selection clipboard -o | xclip -selection primary'
 
 # Logout of tty after starting x
 alias startx='exec startx'
