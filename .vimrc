@@ -37,6 +37,12 @@ set ttimeoutlen=0	" wait up to 0ms after Esc for special key
 
 filetype plugin indent on
 
+" Use smartcase - search case insensitive when the searchterm contains no
+" uppercase characters, case sensitive otherwise
+" Add \C or \c to force case sensitive or -insensitive search
+set ignorecase
+set smartcase
+
 
 " Aesthetics
 
