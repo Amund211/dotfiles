@@ -9,6 +9,9 @@ shopt -s no_empty_cmd_completion
 # Don't put duplicate lines or lines starting with a space in the history
 HISTCONTROL=ignoreboth
 
+# vi-bindings
+set -o vi
+
 alias ls='ls -A --color=auto --group-directories-first'
 alias ll='ls -l'
 alias grep='grep --color=auto'
