@@ -40,7 +40,7 @@ cdls() {
 	else
 		builtin cd "$@"
 	fi
-	[[ $? -eq 0 ]] && ls
+	[ $? -eq 0 ] && ls
 }
 alias cd='cdls'
 
