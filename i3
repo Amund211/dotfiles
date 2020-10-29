@@ -103,6 +103,9 @@ bindsym XF86AudioMute exec --no-startup-id "pactl set-sink-mute @DEFAULT_SINK@ t
 # Toggle touchpad
 bindsym XF86TouchpadToggle exec --no-startup-id "~/.scripts/toggletouchpad.sh"
 
+# Screenshot
+bindsym Print exec --no-startup-id scrot
+
 
 ###############################################################
 #			Letter key bindings
