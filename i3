@@ -48,8 +48,8 @@ exec --no-startup-id "~/.scripts/capsescape.sh"
 # Setting keydelay
 exec --no-startup-id "xset r rate 300 35"
 
-# Start xbanish (hides mouse cursor)
-exec --no-startup-id "xbanish"
+# Start xbanish (hides mouse cursor); don't hide when pressing mod
+exec --no-startup-id "xbanish -i mod4"
 
 # Start machine specific init script
 exec --no-startup-id "~/.scripts/init.sh"
@@ -104,7 +104,14 @@ bindsym XF86AudioMute exec --no-startup-id "pactl set-sink-mute @DEFAULT_SINK@ t
 bindsym XF86TouchpadToggle exec --no-startup-id "~/.scripts/toggletouchpad.sh"
 
 # Screenshot
-bindsym Print exec --no-startup-id scrot
+bindsym $mod+Print exec --no-startup-id "cd ~/screenshots && scrot --quality 100"
+
+# I would like to do `setxkbmap -option grab:break_actions` and then
+# `xdotool key XF86Ungrab`, but that triggers xbanish, so the cursor disappears
+# So instead I have sleep 0.1
+#
+# This uses a feature of my fork of xbanish, where you can send USR2 to show the cursor
+bindsym $mod+Shift+Print exec --no-startup-id "pkill -USR2 xbanish && sleep 0.1 && cd ~/screenshots && scrot --quality 100 -sf"
 
 
 ###############################################################
