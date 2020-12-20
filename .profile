@@ -1,8 +1,6 @@
-# ~/.bash_profile
+# ~/.profile
 
-# This file should eventually be replaced by general .profile
-
-export PATH=$PATH:$HOME/.scripts:$HOME/bin
+export PATH="$PATH:$HOME/.scripts:$HOME/bin"
 export EDITOR='vim'
 export SUDO_EDITOR='vim'
 export VISUAL='vim'
@@ -19,7 +17,7 @@ export HISTSIZE=
 export HISTFILESIZE=
 export HISTTIMEFORMAT='[%F %T %z] '
 
-[ -f "$HOME/.bashrc" ] && source "$HOME/.bashrc"
+[ -f "$HOME/.bashrc" ] && . "$HOME/.bashrc"
 
 # exec startx on login on tty1
 # $XDG_VTNR only works on systems running systemd
