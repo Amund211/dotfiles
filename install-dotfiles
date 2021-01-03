@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# Installs the dotfiles by copying a template sourcing from this directory to the
+# correct locations. If the files already exist, a backup is created.
+
+set -eu
+
+make_backup() {
+	# make_backup <file>
+
+	if [ -z "${1:-}" ]; then
+		echo 'Missing argument <file>' >&2
+		exit 1
+	fi
+
+	if [ -f "$1" ]; then
+		tmpfile=$(mktemp "$1.XXXXXX")
+		echo "[WARNING]: File '$1' already exists, making a backup as '$tmpfile'" >&2
+		cp -a "$1" "$tmpfile"
+	fi
+}
+
+install_template() {
+	# install_template <install_location> <template_file>
+	install_location="${1:-}"
+	template_file="${2:-}"
+
+	if [ -z "$install_location" ]; then
+		echo 'Missing argument <install_location>' >&2
+		exit 1
+	fi
+
+	if [ -z "$template_file" ]; then
+		echo 'Missing argument <template_file>' >&2
+		exit 1
+	elif [ ! -f "$template_file" ]; then
+		echo 'Argument <template_file> either missing or not a regular file' >&2
+		exit 1
+	fi
+
+	make_backup "$install_location"
+
+	cp "$template_file" "$install_location"
+	echo "Successfully copied '$template_file' to '$install_location'"
+}
+
+
+install_template "$HOME/.profile" "templates/.profile"
+install_template "$HOME/.bashrc" "templates/.bashrc"
+install_template "$HOME/.vimrc" "templates/.vimrc"
+install_template "$HOME/.xinitrc" "templates/.xinitrc"
