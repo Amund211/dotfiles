@@ -1,0 +1,3 @@
+" ~/.vimrc
+
+source ~/.dotfiles/.vimrc

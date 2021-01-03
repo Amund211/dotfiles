@@ -1,0 +1,3 @@
+# ~/.profile
+
+. "$HOME/.dotfiles/.profile"
