@@ -152,16 +152,16 @@ bindsym $mod+d exec --no-startup-id dmenu_run
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
 # Show/hide dropdown terminal
-bindsym $mod+t exec "[ $(i3-msg [instance='dropdownTerminal'] scratchpad show 2>/dev/null) = '[{\\"success\\":true}]' ] || $TERMINAL -name dropdownTerminal -e sh -c 'i3-msg [instance='dropdownTerminal'] focus; clear; $SHELL' &"
+bindsym $mod+t exec --no-startup-id "[ $(i3-msg [instance='dropdownTerminal'] scratchpad show 2>/dev/null) = '[{\\"success\\":true}]' ] || $TERMINAL -name dropdownTerminal -e sh -c 'i3-msg [instance='dropdownTerminal'] focus; clear; $SHELL' &"
 
 # Show/hide dropdown python
-bindsym $mod+p exec "[ $(i3-msg [instance='dropdownPython'] scratchpad show 2>/dev/null) = '[{\\"success\\":true}]' ] || $TERMINAL -name dropdownPython -e sh -c 'i3-msg [instance='dropdownPython'] focus; clear; python' &"
+bindsym $mod+p exec --no-startup-id "[ $(i3-msg [instance='dropdownPython'] scratchpad show 2>/dev/null) = '[{\\"success\\":true}]' ] || $TERMINAL -name dropdownPython -e sh -c 'i3-msg [instance='dropdownPython'] focus; clear; python' &"
 
 # start a terminal
 bindsym $mod+Return exec --no-startup-id $TERMINAL
 
 # Run browser
-bindsym $mod+g exec $BROWSER
+bindsym $mod+g exec --no-startup-id $BROWSER
 
 # Window bindings #############################################
 # change focus
