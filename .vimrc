@@ -96,6 +96,8 @@ augroup vimStartup
 
 augroup END
 
+" Show non-breaking space when using :set list
+set listchars+=nbsp:‗
 
 " Commands
 
