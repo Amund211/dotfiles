@@ -5,6 +5,7 @@
 
 shopt -s histappend
 shopt -s no_empty_cmd_completion
+shopt -s dotglob  # Glob hidden files since I have ls='ls -A ...' anyway
 
 # Don't put duplicate lines or lines starting with a space in the history
 HISTCONTROL=ignoreboth
