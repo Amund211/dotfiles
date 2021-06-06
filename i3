@@ -6,6 +6,12 @@
 # Keyboard-settings
 set $mod Mod4
 
+# No title bars for windows
+default_border pixel 1
+
+# Hide borders on workspaces with only one window
+hide_edge_borders smart
+
 floating_modifier $mod
 
 # Font for window titles. Will also be used by the bar unless a different font
@@ -298,4 +304,3 @@ workspace $ws10 output HDMI1
 
 # Start on $ws1
 exec --no-startup-id i3-msg "workspace $ws1"
-
