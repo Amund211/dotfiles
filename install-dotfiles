@@ -45,7 +45,14 @@ install_template() {
 }
 
 
-install_template "$HOME/.profile" "templates/.profile"
 install_template "$HOME/.bashrc" "templates/.bashrc"
 install_template "$HOME/.vimrc" "templates/.vimrc"
 install_template "$HOME/.xinitrc" "templates/.xinitrc"
+
+install_template "$HOME/.profile" "templates/.profile"
+# Make sure that .bash_profile doesn't override our .profile
+bash_profile="$HOME/.bash_profile"
+if [ -f "$bash_profile" ]; then
+	make_backup "$bash_profile"
+	rm "$bash_profile"
+fi
