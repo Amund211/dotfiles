@@ -29,3 +29,11 @@ else
 	sudo -n loadkeys ~/.scripts/ttymaps.kmap 2>/dev/null
 fi
 
+# https://wiki.archlinux.org/title/SSH_keys#ssh-agent
+# Remember to set `AddKeysToAgent yes` in ~/.ssh/config
+if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+    ssh-agent > "$XDG_RUNTIME_DIR/ssh-agent.env"
+fi
+if [ -z "${SSH_AUTH_SOCK:-}" ]; then
+    . "$XDG_RUNTIME_DIR/ssh-agent.env" >/dev/null
+fi
