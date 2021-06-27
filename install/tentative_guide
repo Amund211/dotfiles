@@ -6,28 +6,37 @@
 echo "Do not run this as a script! This is only intended as a reference" >&2
 exit 1
 
-ln -sf /usr/share/zoneinfo/Europe/Oslo /etc/localtime
-hwclock --systohc
-vim /etc/locale.gen 
-locale-gen 
+# Configs
 vim /etc/locale.conf
 vim /etc/vconsole.conf
 vim /etc/hostname
-vim /etc/hosts 
-passwd
+vim /etc/hosts
+vim /etc/default/grub
+vim /etc/ssh/sshd_config
+vim /etc/mkinitcpio.conf
+vim /etc/sysctl.conf
+vim /etc/locale.gen
+scp minitrue:/etc/X11/xorg.conf.d/00* minitrue:/etc/X11/xorg.conf.d/30 *minitrue:/etc/X11/xorg.conf.d/50* .
+visudo
+
+# GRUB
 grub-install --target=x86_64-efi --efi-directory=/efi/ --bootloader-id=GRUB
-blkid /dev/nvme0n1p5
-vim /etc/default/grub 
 grub-mkconfig -o /boot/grub/grub.cfg
+
+# User account
 useradd -m amund
 passwd amund
-visudo
 sudo usermod -aG wheel amund
 sudo usermod -aG docker amund
-git clone git@github.com/Amund211/dotfiles .dotfiles
-sudo systemctl enable --now NetworkManager
-./install-dotfiles 
-mkdir stuff screenshots downloads tmp
+sudo usermod -aG plugdev amund
+
+# Misc
+locale-gen
+passwd
+ln -sf /usr/share/zoneinfo/Europe/Oslo /etc/localtime
+hwclock --systohc
+
+# i3blocks
 git clone https://github.com/vivien/i3blocks-contrib
 cd i3blocks-contrib/
 cd cpu_usage2/
@@ -35,20 +44,23 @@ make
 cd ..
 cd bandwidth2
 make
-scp minitrue:/etc/X11/xorg.conf.d/30* .
-scp minitrue:/etc/X11/xorg.conf.d/00* minitrue:/etc/X11/xorg.conf.d/50* .
-sudoedit /etc/sysctl.conf
-for i in {0..5}; do ./curl.sh make-triggered; done
-for i in {0..5}; do ./curl.sh make-not-triggered; done
-for i in {0..5}; do ./curl.sh make-empty; done
-docker-full exec ignite-api python manage.py migrate
-docker-full exec ignite-api python manage.py index_data
+
+# Dotfiles
+git clone git@github.com/Amund211/dotfiles .dotfiles
+./install-dotfiles
+mkdir stuff screenshots downloads tmp
+
+# Systemd
+sudo systemctl enable --now systemd-timesyncd.service
+sudo systemctl enable --now sshd.socket
+sudo systemctl enable --now NetworkManager
+
+# More applications
 git clone git@github.com:Amund211/xbanish
 cd xbanish/
 make
 sudo make install
-sudo usermod -aG plugdev amund
-sudo systemctl enable --now sshd.socket
+cd ..
 git clone https://aur.archlinux.org/minecraft-launcher.git
 cd minecraft-launcher/
 makepkg -si
@@ -56,5 +68,10 @@ cd ..
 git clone https://aur.archlinux.org/openrazer.git
 cd openrazer/
 makepkg -si
-sudoedit /etc/ssh/sshd_config 
-sudoedit /etc/mkinitcpio.conf 
+
+# Work stuff
+for i in {0..5}; do ./curl.sh make-triggered; done
+for i in {0..5}; do ./curl.sh make-not-triggered; done
+for i in {0..5}; do ./curl.sh make-empty; done
+docker-full exec ignite-api python manage.py migrate
+docker-full exec ignite-api python manage.py index_data
