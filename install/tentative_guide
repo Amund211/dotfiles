@@ -16,7 +16,8 @@ vim /etc/ssh/sshd_config
 vim /etc/mkinitcpio.conf
 vim /etc/sysctl.conf
 vim /etc/locale.gen
-scp minitrue:/etc/X11/xorg.conf.d/00* minitrue:/etc/X11/xorg.conf.d/30 *minitrue:/etc/X11/xorg.conf.d/50* .
+somehow_get /etc/X11/xorg.conf.d/  # Input configs like touchpad settings or mouse accel
+somehow_get bin pics programming .scripts .gitconfig
 visudo
 
 # GRUB
