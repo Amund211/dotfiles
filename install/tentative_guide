@@ -7,6 +7,7 @@ echo "Do not run this as a script! This is only intended as a reference" >&2
 exit 1
 
 # Configs
+rm /home/amund.bash_profile
 vim /etc/locale.conf
 vim /etc/vconsole.conf
 vim /etc/hostname
