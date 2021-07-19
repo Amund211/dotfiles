@@ -86,6 +86,17 @@ augroup longlines
   autocmd FileType python match LongLine /\%89v.*/
 augroup END
 
+" Highlight trailing whitespace
+" https://vim.fandom.com/wiki/Highlight_unwanted_spaces
+augroup trailing_whitespace
+  autocmd!
+  autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+  " Show trailing whitespace and spaces before a tab:
+  autocmd InsertLeave * match ExtraWhitespace /\s\+$\| \+\ze\t/
+  " autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+augroup END
+highlight ExtraWhitespace ctermbg=lightblue ctermfg=white
+
 " Use 4 spaces for tabs in typescript
 augroup typescript
   autocmd!
