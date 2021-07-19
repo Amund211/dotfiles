@@ -79,6 +79,19 @@ augroup END
 " loaded during initialization.
 packadd! matchit
 
+" Highlight long lines
+augroup longlines
+  autocmd!
+  autocmd FileType python highlight LongLine ctermbg=red ctermfg=white
+  autocmd FileType python match LongLine /\%89v.*/
+augroup END
+
+" Use 4 spaces for tabs in typescript
+augroup typescript
+  autocmd!
+  autocmd FileType typescript,typescriptcommon,typescriptreact set expandtab shiftwidth=4 tabstop=4
+augroup END
+
 
 " Misc
 
