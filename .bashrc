@@ -10,6 +10,12 @@ shopt -s dotglob  # Glob hidden files since I have ls='ls -A ...' anyway
 # Don't put duplicate lines or lines starting with a space in the history
 HISTCONTROL=ignoreboth
 
+# Unlimited bash history size, because why not
+# Duplicated from .profile so it it set even when using su
+export HISTSIZE=
+export HISTFILESIZE=
+export HISTTIMEFORMAT='[%F %T %z] '
+
 # vi-bindings
 set -o vi
 
