@@ -117,7 +117,7 @@ bindsym $mod+Print exec --no-startup-id "cd ~/screenshots && scrot --quality 100
 # So instead I have sleep 0.1
 #
 # This uses a feature of my fork of xbanish, where you can send USR2 to show the cursor
-bindsym $mod+Shift+Print exec --no-startup-id "pkill -USR2 xbanish && sleep 0.1 && cd ~/screenshots && scrot --quality 100 -sf"
+bindsym $mod+Shift+Print exec --no-startup-id "pkill -USR2 xbanish; sleep 0.1; cd ~/screenshots && scrot --quality 100 -s -f"
 
 
 ###############################################################
