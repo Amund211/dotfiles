@@ -36,7 +36,14 @@ alias sel='xclip -selection clipboard -o | xclip -selection primary'
 alias startx='exec startx'
 alias i3config='$EDITOR ~/.dotfiles/i3'
 alias i3blocksconfig='$EDITOR ~/.dotfiles/i3blocks'
-PS1='[\u@\h \W]\$ '
+
+location='[\u@\h \W]'
+# Color the $ green or red based on last exit code
+prompt="\$(if [ \$? == 0 ]; then echo '\[\e[0;40;92m\]'; else echo '\[\e[0;40;91m\]'; fi)\$\[\e[0m\] "
+PS1="$location$prompt"
+
+unset location
+unset prompt
 
 cdls() {
 	if [ $# -eq 0 ]
