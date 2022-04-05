@@ -39,6 +39,7 @@ alias i3blocksconfig='$EDITOR ~/.dotfiles/i3blocks'
 
 red='\[\e[0;40;31m\]'
 green='\[\e[0;40;32m\]'
+yellow='\[\e[0;40;33m\]'
 magenta='\[\e[0;40;35m\]'
 aqua='\[\e[0;40;36m\]'
 
