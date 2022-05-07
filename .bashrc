@@ -53,8 +53,14 @@ location="$red[$yellow\u$green@$aqua\h $magenta\W$red]$reset"
 prompt="\$(EXIT_CODE=\$?; if [ \$EXIT_CODE == 0 ]; then echo '$bright_green'; else echo '$bright_red('"\$EXIT_CODE"')'; fi)\$$reset "
 PS1="$location$prompt"
 
-unset location, prompt
-unset red, green, magenta, aqua, bright_green, bright_red
+unset location
+unset prompt
+unset red
+unset green
+unset magenta
+unset aqua
+unset bright_green
+unset bright_red
 
 cdls() {
 	if [ $# -eq 0 ]
