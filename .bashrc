@@ -37,20 +37,17 @@ alias startx='exec startx'
 alias i3config='$EDITOR ~/.dotfiles/i3'
 alias i3blocksconfig='$EDITOR ~/.dotfiles/i3blocks'
 
-red='\[\e[31m\]'
-green='\[\e[32m\]'
-yellow='\[\e[33m\]'
-magenta='\[\e[35m\]'
-aqua='\[\e[36m\]'
-
-bright_green='\[\e[92m\]'
-bright_red='\[\e[91m\]'
+red='\[\e[91m\]'
+green='\[\e[92m\]'
+yellow='\[\e[93m\]'
+magenta='\[\e[95m\]'
+aqua='\[\e[96m\]'
 
 reset='\[\e[0m\]'
 
 location="$red[$yellow\u$green@$aqua\h $magenta\W$red]$reset"
 # Color the $ green or red based on last exit code
-prompt="\$(EXIT_CODE=\$?; if [ \$EXIT_CODE == 0 ]; then echo '$bright_green'; else echo '$bright_red('"\$EXIT_CODE"')'; fi)\$$reset "
+prompt="\$(EXIT_CODE=\$?; if [ \$EXIT_CODE == 0 ]; then echo '$green'; else echo '$red('"\$EXIT_CODE"')'; fi)\$$reset "
 PS1="$location$prompt"
 
 unset location
@@ -59,8 +56,6 @@ unset red
 unset green
 unset magenta
 unset aqua
-unset bright_green
-unset bright_red
 
 cdls() {
 	if [ $# -eq 0 ]
