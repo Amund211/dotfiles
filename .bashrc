@@ -19,6 +19,7 @@ export HISTTIMEFORMAT='[%F %T %z] '
 # vi-bindings
 set -o vi
 
+alias sudo='sudo -v; sudo '
 alias ls='ls -A --color=auto --group-directories-first'
 alias ll='ls -l'
 alias grep='grep --color=auto'
