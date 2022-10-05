@@ -9,6 +9,9 @@ URxvt.font: xft:monospace:size=10
 URxvt.scrollBar: false
 URxvr.letterSpace: -1
 
+!Scrollback
+URxvt.saveLines: 20000
+
 
 URxvt*background: black
 
