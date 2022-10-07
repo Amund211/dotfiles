@@ -120,9 +120,6 @@ augroup vimStartup
 
 augroup END
 
-" Show non-breaking space when using :set list
-set listchars+=nbsp:‗
-
 " Commands
 
 command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
