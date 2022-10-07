@@ -33,6 +33,9 @@ fi
 # https://unix.stackexchange.com/questions/521037/what-is-the-environment-variable-xdg-vtnr#answer-521049
 if [ -z "${DISPLAY:-}" ] && [ "$XDG_VTNR" = '1' ]; then
 	exec startx
+elif [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+	# SSH session
+	:  # No-op
 else
 	# Swap caps and escape when in tty
 	sudo -n loadkeys ~/.scripts/ttymaps.kmap 2>/dev/null
