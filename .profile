@@ -22,10 +22,10 @@ export HISTTIMEFORMAT='[%F %T %z] '
 # https://wiki.archlinux.org/title/SSH_keys#ssh-agent
 # Remember to set `AddKeysToAgent yes` in ~/.ssh/config
 if ! pgrep -u "$USER" ssh-agent > /dev/null; then
-    ssh-agent > "$XDG_RUNTIME_DIR/ssh-agent.env"
+    ssh-agent > "${XDG_RUNTIME_DIR:-"$HOME"}/ssh-agent.env"
 fi
 if [ -z "${SSH_AUTH_SOCK:-}" ]; then
-    . "$XDG_RUNTIME_DIR/ssh-agent.env" >/dev/null
+    . "${XDG_RUNTIME_DIR:-"$HOME"}/ssh-agent.env" >/dev/null
 fi
 
 # exec startx on login on tty1
