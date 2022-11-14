@@ -110,14 +110,14 @@ bindsym XF86AudioMute exec --no-startup-id "pactl set-sink-mute @DEFAULT_SINK@ t
 bindsym XF86TouchpadToggle exec --no-startup-id "~/.scripts/toggletouchpad.sh"
 
 # Screenshot
-bindsym $mod+Print exec --no-startup-id "cd ~/screenshots && scrot --quality 100"
+bindsym $mod+Print exec --no-startup-id "cd ~/screenshots && scrot --quality 100 -e 'cat $f | xclip -selection clipboard -t image/png'"
 
 # I would like to do `setxkbmap -option grab:break_actions` and then
 # `xdotool key XF86Ungrab`, but that triggers xbanish, so the cursor disappears
 # So instead I have sleep 0.1
 #
 # This uses a feature of my fork of xbanish, where you can send USR2 to show the cursor
-bindsym $mod+Shift+Print exec --no-startup-id "pkill -USR2 xbanish; sleep 0.1; cd ~/screenshots && scrot --quality 100 -s -f"
+bindsym $mod+Shift+Print exec --no-startup-id "pkill -USR2 xbanish; sleep 0.1; cd ~/screenshots && scrot --quality 100 -s -f -e 'cat $f | xclip -selection clipboard -t image/png'"
 
 
 ###############################################################
