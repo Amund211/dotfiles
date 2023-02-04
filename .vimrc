@@ -43,6 +43,9 @@ filetype plugin indent on
 set ignorecase
 set smartcase
 
+" Tabwidth 4
+set tabstop=4 shiftwidth=4
+
 
 " Aesthetics
 
