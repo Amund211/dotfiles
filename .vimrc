@@ -106,6 +106,9 @@ augroup END
 
 " Misc
 
+" Default to latex
+let g:tex_flavor = "latex"
+
 augroup vimStartup
   au!
 
