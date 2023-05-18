@@ -73,6 +73,8 @@ alias gp='git push'
 __git_complete gp _git_push
 alias gu='git pull'
 __git_complete gu _git_pull
+alias gb='git branch'
+__git_complete gb _git_branch
 
 # Logout of tty after starting x
 alias startx='exec startx'
