@@ -53,10 +53,14 @@ alias gds='git diff --staged'
 __git_complete gds _git_diff
 alias ga='git add'
 __git_complete ga _git_add
+alias gap='git add --patch'
+__git_complete gap _git_add
 alias gc='git commit'
 __git_complete gc _git_commit
 alias gca='git commit --amend'
 __git_complete gca _git_commit
+alias gcp='git commit --patch'
+__git_complete gcp _git_commit
 alias gl='git log'
 __git_complete gl _git_log
 alias gsw='git switch'
