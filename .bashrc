@@ -33,6 +33,41 @@ alias pw='watch -n 1 ping -c 1 8.8.8.8'
 alias clip='xclip -selection primary -o | xclip -selection clipboard'
 alias sel='xclip -selection clipboard -o | xclip -selection primary'
 
+# Git stuff
+if [ -f /usr/share/bash-completion/completions/git ]; then
+	source /usr/share/bash-completion/completions/git
+else
+	echo ERROR
+	__git_complete() {
+		:
+	}
+fi
+
+alias g='git'
+__git_complete g __git_main
+alias gs='git status'
+__git_complete gs _git_status
+alias gd='git diff'
+__git_complete gd _git_diff
+alias ga='git add'
+__git_complete ga _git_add
+alias gc='git commit'
+__git_complete gc _git_commit
+alias gca='git commit --amend'
+__git_complete gca _git_commit
+alias gl='git log'
+__git_complete gl _git_log
+alias gsw='git switch'
+__git_complete gsw _git_switch
+alias gr='git rebase'
+__git_complete gr _git_rebase
+alias gri='git rebase --interactive'
+__git_complete gri _git_rebase
+alias gp='git push'
+__git_complete gp _git_push
+alias gu='git pull'
+__git_complete gu _git_pull
+
 # Logout of tty after starting x
 alias startx='exec startx'
 alias i3config='$EDITOR ~/.dotfiles/i3'
