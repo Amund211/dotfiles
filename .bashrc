@@ -49,6 +49,8 @@ alias gs='git status'
 __git_complete gs _git_status
 alias gd='git diff'
 __git_complete gd _git_diff
+alias gds='git diff --staged'
+__git_complete gds _git_diff
 alias ga='git add'
 __git_complete ga _git_add
 alias gc='git commit'
