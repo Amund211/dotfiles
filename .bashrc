@@ -61,6 +61,8 @@ alias gca='git commit --amend'
 __git_complete gca _git_commit
 alias gcp='git commit --patch'
 __git_complete gcp _git_commit
+alias gsh='git show'
+__git_complete gsh _git_show
 alias gl='git log'
 __git_complete gl _git_log
 alias gsw='git switch'
