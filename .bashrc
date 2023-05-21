@@ -103,13 +103,17 @@ __git_complete gri _git_rebase
 alias gsw='git switch'
 __git_complete gsw _git_switch
 
-# tag       Create, list, delete or verify a tag object signed with GPG
+alias gt='git tag'
+__git_complete gt _git_tag
 
 # collaborate (see also: git help workflows)
-# fetch     Download objects and refs from another repository
+alias gf='git fetch'
+__git_complete gf _git_fetch
 
 alias gp='git push'
 __git_complete gp _git_push
+alias gpf='git push --force-with-lease'
+__git_complete gpf _git_push
 
 alias gu='git pull'
 __git_complete gu _git_pull
