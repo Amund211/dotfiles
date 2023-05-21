@@ -51,6 +51,8 @@ alias gd='git diff'
 __git_complete gd _git_diff
 alias gds='git diff --staged'
 __git_complete gds _git_diff
+alias gst='git stash'
+__git_complete gst _git_stash
 alias ga='git add'
 __git_complete ga _git_add
 alias gap='git add --patch'
