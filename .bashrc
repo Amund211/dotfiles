@@ -45,40 +45,80 @@ fi
 
 alias g='git'
 __git_complete g __git_main
-alias gs='git status'
-__git_complete gs _git_status
-alias gd='git diff'
-__git_complete gd _git_diff
-alias gds='git diff --staged'
-__git_complete gds _git_diff
-alias gst='git stash'
-__git_complete gst _git_stash
+
+# start a working area (see also: git help tutorial)
+# clone     Clone a repository into a new directory
+# init      Create an empty Git repository or reinitialize an existing one
+
+# work on the current change (see also: git help everyday)
 alias ga='git add'
 __git_complete ga _git_add
 alias gap='git add --patch'
 __git_complete gap _git_add
+
+# mv        Move or rename a file, a directory, or a symlink
+# restore   Restore working tree files
+# rm        Remove files from the working tree and from the index
+
+# examine the history and state (see also: git help revisions)
+# bisect    Use binary search to find the commit that introduced a bug
+
+alias gd='git diff'
+__git_complete gd _git_diff
+alias gds='git diff --staged'
+__git_complete gds _git_diff
+
+alias gg='git grep'
+__git_complete gg _git_grep
+
+alias gl='git log'
+__git_complete gl _git_log
+
+alias gsh='git show'
+__git_complete gsh _git_show
+
+alias gs='git status'
+__git_complete gs _git_status
+
+# grow, mark and tweak your common history
+alias gb='git branch'
+__git_complete gb _git_branch
+
 alias gc='git commit'
 __git_complete gc _git_commit
 alias gca='git commit --amend'
 __git_complete gca _git_commit
 alias gcp='git commit --patch'
 __git_complete gcp _git_commit
-alias gsh='git show'
-__git_complete gsh _git_show
-alias gl='git log'
-__git_complete gl _git_log
-alias gsw='git switch'
-__git_complete gsw _git_switch
+
+# merge     Join two or more development histories together
+
 alias gr='git rebase'
 __git_complete gr _git_rebase
 alias gri='git rebase --interactive'
 __git_complete gri _git_rebase
+
+# reset     Reset current HEAD to the specified state
+
+alias gsw='git switch'
+__git_complete gsw _git_switch
+
+# tag       Create, list, delete or verify a tag object signed with GPG
+
+# collaborate (see also: git help workflows)
+# fetch     Download objects and refs from another repository
+
 alias gp='git push'
 __git_complete gp _git_push
+
 alias gu='git pull'
 __git_complete gu _git_pull
-alias gb='git branch'
-__git_complete gb _git_branch
+
+# Other
+alias gst='git stash'
+__git_complete gst _git_stash
+
+
 
 # Logout of tty after starting x
 alias startx='exec startx'
