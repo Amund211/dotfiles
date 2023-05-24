@@ -121,6 +121,8 @@ __git_complete gu _git_pull
 # Other
 alias gst='git stash'
 __git_complete gst _git_stash
+alias gstp='git stash pop'
+__git_complete gstp _git_stash
 
 
 
