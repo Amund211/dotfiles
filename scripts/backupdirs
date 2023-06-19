@@ -1,0 +1,29 @@
+# Basics
+/home/amund/docs
+/home/amund/stuff
+/home/amund/bin
+/home/amund/.scripts
+/home/amund/programming
+/home/amund/.bash_history
+/home/amund/screenshots
+/home/amund/pics
+
+# Minecraft
+/home/amund/.minecraft/config
+/home/amund/.minecraft/screenshots
+/home/amund/.minecraft/mods
+/home/amund/.minecraft/the5zigmod
+/home/amund/.minecraft/resourcepacks/CPT
+
+/home/amund/.minecraft/options.txt
+/home/amund/.minecraft/18_options.txt
+/home/amund/.minecraft/116_options.txt
+/home/amund/.minecraft/optionsof.txt
+/home/amund/.minecraft/114_optionsof.txt
+/home/amund/.minecraft/launcher_profiles.json
+/home/amund/.minecraft/hystatsmod.json
+/home/amund/.minecraft/betterfps.txt
+/home/amund/.minecraft/optionsshaders.txt
+
+# Machine-specific identifier
+/etc/hostname

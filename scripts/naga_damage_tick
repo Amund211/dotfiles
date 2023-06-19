@@ -1,0 +1,51 @@
+#!/usr/bin/python3
+
+from time import sleep
+
+path = "/sys/bus/hid/drivers/razermouse/0003:1532:0067.0001/matrix_effect_static"
+
+RED = (255, 0, 0)
+BLUE = (0, 0x44, 0xFF)
+
+
+def color_string(color):
+    return bytes(color)
+    return "".join(hex(c)[2:].rjust(2, "0") for c in color)
+
+
+def color_diff(a, b):
+    """Return a - b"""
+    return tuple((ac - bc for ac, bc in zip(a, b)))
+
+
+def color_div(color, r):
+    """Return color/r"""
+    return tuple((c / r for c in color))
+
+
+def normalize(color):
+    """Clamp and round color"""
+    return tuple(map(lambda c: max(0, min(255, round(c))), color))
+
+
+def set_color(f, color):
+    f.write(color_string(normalize(color)))
+    f.flush()
+
+
+total_diff = color_diff(RED, BLUE)
+n_steps = 3
+pause = 0.1
+
+cur = RED
+cur = color_diff(RED, (0, 0, 0))
+
+step = color_div(total_diff, n_steps)
+
+with open(path, "wb") as f:
+    for i in range(n_steps):
+        set_color(f, cur)
+        cur = color_diff(cur, step)
+        sleep(pause)
+
+    set_color(f, BLUE)
