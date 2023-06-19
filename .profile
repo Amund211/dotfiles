@@ -1,6 +1,6 @@
 # ~/.profile
 
-export PATH="$PATH:$HOME/.scripts:$HOME/bin"
+export PATH="$HOME/bin:$PATH:$HOME/.dotfiles/scripts"
 export EDITOR='vim'
 export SUDO_EDITOR='vim'
 export VISUAL='vim'
