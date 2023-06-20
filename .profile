@@ -38,5 +38,5 @@ elif [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
 	:  # No-op
 else
 	# Swap caps and escape when in tty
-	sudo -n loadkeys ~/.scripts/ttymaps.kmap 2>/dev/null
+	sudo -n loadkeys ~/.dotfiles/scripts/ttymaps.kmap 2>/dev/null
 fi

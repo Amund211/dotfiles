@@ -49,7 +49,7 @@ exec --no-startup-id "feh --bg-fill ~/pics/bg.jpg --no-fehbg"
 exec --no-startup-id "nm-applet --no-agent"
 
 # Remapping caps to super/escape
-exec --no-startup-id "~/.scripts/capsescape.sh"
+exec --no-startup-id "~/.dotfiles/scripts/capsescape.sh"
 
 # Setting keydelay
 exec --no-startup-id "xset r rate 300 35"
@@ -58,7 +58,7 @@ exec --no-startup-id "xset r rate 300 35"
 exec --no-startup-id "xbanish -i mod4"
 
 # Start machine specific init script
-exec --no-startup-id "~/.scripts/init.sh"
+exec --no-startup-id "~/.dotfiles/scripts/init.sh"
 
 
 ###############################################################
@@ -87,7 +87,7 @@ bindsym Control+F7 exec --no-startup-id "xdotool mousedown 3"
 bindsym XF86Display exec --no-startup-id "light -S 0"
 
 # Update all of i3blocks
-bindsym $mod+Insert exec --no-startup-id "~/.scripts/updateBlocks.sh"
+bindsym $mod+Insert exec --no-startup-id "~/.dotfiles/scripts/updateBlocks.sh"
 
 # Screenlocking
 bindsym $mod+Shift+Delete exec --no-startup-id "$SCREENLOCKER"
@@ -98,8 +98,8 @@ bindsym $mod+Shift+space floating toggle
 # change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
 
-bindsym XF86MonBrightnessUp exec --no-startup-id "~/.scripts/brightness.sh 1" 
-bindsym XF86MonBrightnessDown exec --no-startup-id "~/.scripts/brightness.sh -1"
+bindsym XF86MonBrightnessUp exec --no-startup-id "~/.dotfiles/scripts/brightness.sh 1"
+bindsym XF86MonBrightnessDown exec --no-startup-id "~/.dotfiles/scripts/brightness.sh -1"
 
 # Audio keys
 bindsym XF86AudioRaiseVolume exec --no-startup-id "pactl set-sink-volume @DEFAULT_SINK@ +3% && pactl set-sink-mute @DEFAULT_SINK@ 0 && pkill i3blocks -RTMIN+10"
@@ -107,7 +107,7 @@ bindsym XF86AudioLowerVolume exec --no-startup-id "pactl set-sink-volume @DEFAUL
 bindsym XF86AudioMute exec --no-startup-id "pactl set-sink-mute @DEFAULT_SINK@ toggle && pkill i3blocks -RTMIN+10"
 
 # Toggle touchpad
-bindsym XF86TouchpadToggle exec --no-startup-id "~/.scripts/toggletouchpad.sh"
+bindsym XF86TouchpadToggle exec --no-startup-id "~/.dotfiles/scripts/toggletouchpad.sh"
 
 # Screenshot
 bindsym $mod+Print exec --no-startup-id "cd ~/screenshots && scrot --quality 100 -e 'cat $f | xclip -selection clipboard -t image/png'"
@@ -126,14 +126,14 @@ bindsym $mod+Shift+Print exec --no-startup-id "pkill -USR2 xbanish; sleep 0.1; c
 
 # Utility bindings ############################################
 # Power-options
-bindsym $mod+Shift+p exec --no-startup-id "~/.scripts/poweroptions.sh '$SCREENLOCKER'"
+bindsym $mod+Shift+p exec --no-startup-id "~/.dotfiles/scripts/poweroptions.sh '$SCREENLOCKER'"
 
 # Screen-options
-bindsym $mod+o exec --no-startup-id "~/.scripts/screensel.sh"
+bindsym $mod+o exec --no-startup-id "~/.dotfiles/scripts/screensel.sh"
 
 # Sink-options
-bindsym $mod+XF86AudioRaiseVolume exec --no-startup-id "~/.scripts/sinksel.sh"
-bindsym $mod+XF86AudioLowerVolume exec --no-startup-id "~/.scripts/sourcesel.sh"
+bindsym $mod+XF86AudioRaiseVolume exec --no-startup-id "~/.dotfiles/scripts/sinksel.sh"
+bindsym $mod+XF86AudioLowerVolume exec --no-startup-id "~/.dotfiles/scripts/sourcesel.sh"
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -142,7 +142,7 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 
 # exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec  --no-startup-id "~/.scripts/prompt.sh 'Are you sure you want to exit i3?' 'i3-msg exit'"
+bindsym $mod+Shift+e exec  --no-startup-id "~/.dotfiles/scripts/prompt.sh 'Are you sure you want to exit i3?' 'i3-msg exit'"
 # "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
 # Restart NetworkManager

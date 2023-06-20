@@ -22,7 +22,7 @@ backuphost=miniplenty
 remotebackupdir="/backup/$hostname"
 
 # Hardcoded internal factors
-backupdirfile=~/.scripts/backupdirs
+backupdirfile=~/.dotfiles/scripts/backupdirs
 tmpbackupdir=/var/tmp/backup
 
 filename=$hostname"_"$(date +'%FT%H%M%z').zip

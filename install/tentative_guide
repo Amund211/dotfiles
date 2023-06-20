@@ -18,7 +18,7 @@ vim /etc/mkinitcpio.conf
 vim /etc/sysctl.conf
 vim /etc/locale.gen
 somehow_get /etc/X11/xorg.conf.d/  # Input configs like touchpad settings or mouse accel
-somehow_get bin pics programming .scripts .gitconfig
+somehow_get bin pics programming .gitconfig
 visudo
 
 # GRUB

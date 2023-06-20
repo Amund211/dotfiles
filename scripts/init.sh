@@ -6,7 +6,7 @@ nagaID=$(echo -n $nagaIDs | python -c "import sys;print(min(int(i) for i in sys.
 
 if [ ! -z "$nagaID" ]; then
 	# Only exec if the mouse is found
-	~/.scripts/nagalight.sh
+	~/.dotfiles/scripts/nagalight.sh
 	exec xinput test $nagaID | awk '/button release [13]/ { print; fflush(stdout) }' | python ~/programming/xcountclicks/piper.py
 else
 	#echo $(date) >> ~/.failedmouseattach.log
