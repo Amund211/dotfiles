@@ -53,6 +53,8 @@ __git_complete g __git_main
 # work on the current change (see also: git help everyday)
 alias ga='git add'
 __git_complete ga _git_add
+alias gau='git add -u'
+__git_complete gau _git_add
 alias gap='git add --patch'
 __git_complete gap _git_add
 
@@ -102,6 +104,8 @@ __git_complete gri _git_rebase
 
 alias gsw='git switch'
 __git_complete gsw _git_switch
+alias gswc='git switch -c'
+__git_complete gswc _git_switch
 
 alias gt='git tag'
 __git_complete gt _git_tag
