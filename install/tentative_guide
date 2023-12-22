@@ -17,6 +17,7 @@ vim /etc/ssh/sshd_config
 vim /etc/mkinitcpio.conf
 vim /etc/sysctl.conf
 vim /etc/locale.gen
+vim /etc/pacman.conf
 somehow_get /etc/X11/xorg.conf.d/  # Input configs like touchpad settings or mouse accel
 somehow_get bin pics programming .gitconfig
 visudo
@@ -56,6 +57,7 @@ mkdir stuff screenshots downloads tmp
 sudo systemctl enable --now systemd-timesyncd.service
 sudo systemctl enable --now sshd.socket
 sudo systemctl enable --now NetworkManager
+sudo systemctl enable --now reflector.timer
 
 # More applications
 git clone git@github.com:Amund211/xbanish
