@@ -32,6 +32,7 @@ alias h='$TERMINAL >/dev/null 2>/dev/null & disown $!'
 alias pw='watch -n 1 ping -c 1 8.8.8.8'
 alias clip='xclip -selection primary -o | xclip -selection clipboard'
 alias sel='xclip -selection clipboard -o | xclip -selection primary'
+alias nv='nvim'
 
 # Git stuff
 if [ -f /usr/share/bash-completion/completions/git ]; then
@@ -92,6 +93,8 @@ alias gca='git commit --amend'
 __git_complete gca _git_commit
 alias gcp='git commit --patch'
 __git_complete gcp _git_commit
+alias gcu='git commit -u'
+__git_complete gcu _git_commit
 
 # merge     Join two or more development histories together
 
