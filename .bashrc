@@ -158,16 +158,29 @@ unset green
 unset magenta
 unset aqua
 
-cdls() {
-	if [ $# -eq 0 ]
-	then
-		builtin cd
-	else
-		builtin cd "$@"
-	fi
-	[ $? -eq 0 ] && ls
-}
-alias cd='cdls'
+
+if command -v zoxide &> /dev/null; then
+	eval "$(zoxide init bash --cmd zox)"
+	cd() {
+		zox $@ && ls
+	}
+	alias cdi='zoxi'
+
+    builtin complete -F __zoxide_z_complete -o filenames -- cd
+    builtin complete -r cdi &>/dev/null || builtin true
+else
+	echo "zoxide not installed - using builtin cd" >&2
+	cd() {
+		if [ $# -eq 0 ]
+		then
+			builtin cd
+		else
+			builtin cd "$@"
+		fi
+		[ $? -eq 0 ] && ls
+	}
+fi
+
 
 mkdirc() {
 	mkdir $@
