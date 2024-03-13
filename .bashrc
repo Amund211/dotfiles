@@ -166,8 +166,8 @@ if command -v zoxide &> /dev/null; then
 	}
 	alias cdi='zoxi'
 
-    builtin complete -F __zoxide_z_complete -o filenames -- cd
-    builtin complete -r cdi &>/dev/null || builtin true
+	builtin complete -F __zoxide_z_complete -o filenames -- cd
+	builtin complete -r cdi &>/dev/null || builtin true
 else
 	echo "zoxide not installed - using builtin cd" >&2
 	cd() {
