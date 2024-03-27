@@ -95,6 +95,8 @@ alias gcp='git commit --patch'
 __git_complete gcp _git_commit
 alias gcu='git commit -u'
 __git_complete gcu _git_commit
+alias gcau='git commit --amend -u'
+__git_complete gcau _git_commit
 
 # merge     Join two or more development histories together
 
