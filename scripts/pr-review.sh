@@ -13,7 +13,7 @@ send_notification() {
 	subtitle=$2
 	url=$3
 
-	chromium "$url" > /dev/null 2>&1 &
+	chromium --window-name=pr-review --new-window "$url" > /dev/null 2>&1 &
 
 	ACTION="$(dunstify --action="default,Open" --timeout=30000 "$title" "$subtitle")"
 
@@ -72,5 +72,5 @@ fi
 
 while true; do
     check > "$tmpdir/output" 2>&1 
-    sleep 60
+    sleep 20
 done

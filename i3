@@ -304,3 +304,6 @@ workspace $ws10 output HDMI1
 
 # Start on $ws1
 exec --no-startup-id i3-msg "workspace $ws1"
+
+# assign pr-review to ws10
+assign [title="pr-review"] $ws10
