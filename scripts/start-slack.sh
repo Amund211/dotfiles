@@ -25,8 +25,8 @@ while true; do
 		dunstify 'Focus time has started' 'Please close slack' --timeout=300000
 	elif [[ $state == $FOCUS ]] && ! is_focus; then
 		state=$OPERATIONS
-		dunstify 'Focus time has ended' 'Slack has been opened' --timeout=60000
-		chromium 'https://app.slack.com/client/T3SMJ1JQP' &>/dev/null &
+		dunstify 'Focus time has ended' 'Open slack' --timeout=60000
+		# chromium 'https://app.slack.com/client/T3SMJ1JQP' &>/dev/null &
 		disown -a
 	fi
 	sleep 60
