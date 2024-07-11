@@ -19,6 +19,11 @@ send_notification() {
 
 	case "$ACTION" in
 	"default")
+		# Middle click
+		i3-msg workspace 10 >/dev/null 2>&1
+		;;
+	"2")
+		# Left or right click
 		i3-msg workspace 10 >/dev/null 2>&1
 		;;
 	esac
