@@ -164,7 +164,7 @@ unset aqua
 if command -v zoxide &> /dev/null; then
 	eval "$(zoxide init bash --cmd zox)"
 	cd() {
-		zox $@ && ls
+		zox "$@" && ls
 	}
 	alias cdi='zoxi'
 
@@ -192,7 +192,7 @@ unset nvm_init_path
 
 
 mkdirc() {
-	mkdir $@
+	mkdir "$@"
 	cd "$1"
 }
 
