@@ -174,13 +174,11 @@ if command -v zoxide &> /dev/null; then
 else
 	echo "zoxide not installed - using builtin cd" >&2
 	cd() {
-		if [ $# -eq 0 ]
-		then
-			builtin cd
+		if [ $# -eq 0 ]; then
+			builtin cd && ls
 		else
-			builtin cd "$@"
+			builtin cd "$@" && ls
 		fi
-		[ $? -eq 0 ] && ls
 	}
 fi
 
@@ -193,7 +191,6 @@ unset nvm_init_path
 
 
 mkdirc() {
-	mkdir "$@"
-	cd "$1"
+	mkdir "$@" && cd "$1" || return $?
 }
 
