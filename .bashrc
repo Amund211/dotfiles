@@ -183,6 +183,13 @@ else
 	}
 fi
 
+nvm_init_path='/usr/share/nvm/init-nvm.sh'
+if command -v nvm &> /dev/null && [ -f "$nvm_init_path" ]; then
+	export NVM_DIR="$HOME/.cache/nvm"
+	. "$nvm_init_path"
+fi
+unset nvm_init_path
+
 
 mkdirc() {
 	mkdir $@
