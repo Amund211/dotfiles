@@ -151,7 +151,7 @@ reset='\[\e[0m\]'
 
 location="${red}[$yellow\u$green@$aqua\h $magenta\W$red]$reset"
 # Color the $ green or red based on last exit code
-prompt="\$(EXIT_CODE=\$?; if [ \$EXIT_CODE == 0 ]; then echo '$green'; else echo '$red('"\$EXIT_CODE"')'; fi)\$$reset "
+prompt="\$(EXIT_CODE=\$?; if [ \$EXIT_CODE == 0 ]; then echo '$green'; else echo '$red('\$EXIT_CODE')'; fi)\$$reset "
 PS1="$location$prompt"
 
 unset location
