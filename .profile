@@ -10,7 +10,7 @@ export BROWSER='firefox'
 export SCREENLOCKER='i3lock -e -c 112233'
 
 # Editor used by vite-plugin-react-click-to-component
-export LAUNCH_EDITOR='$HOME/.dotfiles/scripts/launch_editor.py'
+export LAUNCH_EDITOR="$HOME/.dotfiles/scripts/launch_editor.py"
 
 # Disable less history
 export LESSHISTFILE='-'
