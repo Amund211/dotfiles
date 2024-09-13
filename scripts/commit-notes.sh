@@ -9,7 +9,12 @@ fi
 
 cd "$HOME/git/notes"
 git add .
+
+echo Changes:
+git status --short
+
 git commit -m "Notes $(date --iso-8601=seconds)
 
 $(git status --short)"
+
 git push
