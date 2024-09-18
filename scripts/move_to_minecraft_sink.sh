@@ -1,5 +1,5 @@
 #!/bin/sh
-pactl list sink-inputs | while read -r line ; do
+pactl list sink-inputs | while read -r line; do
 	if res="$(echo $line | grep -oP 'Sink Input #\K[^$]+')"; then
 		id="$res"
 		echo parsing id $id

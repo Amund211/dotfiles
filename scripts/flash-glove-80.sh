@@ -42,8 +42,8 @@ wait_for_block_device() {
 
 	if [ "$(echo "$new_blks" | wc -l)" != '1' ]; then
 		echo 'Found multiple block devices' >&2
-		exit 1;
-	fi;
+		exit 1
+	fi
 
 	echo "$new_blks"
 }

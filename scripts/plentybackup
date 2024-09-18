@@ -12,7 +12,6 @@ if [ "${1-}" = '-h' ] || [ "${1-}" = '--help' ]; then
 	exit 0
 fi
 
-
 # Get local hostname
 hostname=$(hostname)
 
@@ -34,15 +33,13 @@ fi
 echo "Target directories:"
 sed 's/^/\t/' $backupdirfile
 
-
 echo "Zipping files to $tmpbackupdir/$filename"
 # Create tmpdir
 mkdir -p "$tmpbackupdir"
 # Removing empty lines and lines starting with a # (comments)
 sed '/^\(#.*\)\{0,1\}$/d' $backupdirfile |
-	zip -r "$tmpbackupdir/$filename" -@ -x '**/venv/*' 1> /dev/null
+	zip -r "$tmpbackupdir/$filename" -@ -x '**/venv/*' 1>/dev/null
 echo "Completed zipping. Size of backup: $(du -h "$tmpbackupdir/$filename" | awk '{print $1}')"
-
 
 echo "Mounting backupdrive on $backuphost"
 # if ssh $backuphost :; then
@@ -54,14 +51,12 @@ else
 	exit 1
 fi
 
-
 echo "Transferring backup"
-if scp "$tmpbackupdir/$filename" "$backuphost:$remotebackupdir/" 1> /dev/null; then
+if scp "$tmpbackupdir/$filename" "$backuphost:$remotebackupdir/" 1>/dev/null; then
 	echo "Transfer complete"
 else
 	echo "Transfer failed" >&2
 fi
-
 
 echo "Unmounting backupdrive"
 # if ssh $backuphost :; then
@@ -74,7 +69,6 @@ else
 fi
 
 # Prompt to clear out $tmpbackupdir if size is > ~1Gb
-if [ "$(du -s --bytes "$tmpbackupdir" | awk '{print $1}')" -gt 1000000000 ];
-then
+if [ "$(du -s --bytes "$tmpbackupdir" | awk '{print $1}')" -gt 1000000000 ]; then
 	echo "$tmpbackupdir is currently taking up $(du -h "$tmpbackupdir" | awk '{print $1}'). Consider cleaning it out."
 fi

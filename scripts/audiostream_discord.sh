@@ -8,14 +8,12 @@ output_sink='alsa_output.pci-0000_09_00.4.analog-stereo'
 # Screen speakers
 #output_sink='alsa_output.pci-0000_07_00.1.hdmi-stereo-extra2'
 
-
 # Denoised mic
 mic_source='denoised'
 
 # Raw mic
 # Briste atm, need to make it a sink
 # mic_sink='alsa_input.usb-Razer_Inc_Razer_Seiren_Mini_UC2045L03206312-00.mono-fallback'
-
 
 ### Application mix ######################
 # Sink that we can play application audio to

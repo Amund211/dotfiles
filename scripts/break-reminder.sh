@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -u 
+set -u
 
 interval="${1:-$((30 * 60))}"
 

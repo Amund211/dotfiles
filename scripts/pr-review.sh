@@ -13,7 +13,7 @@ send_notification() {
 	subtitle=$2
 	url=$3
 
-	chromium --window-name=pr-review --new-window "$url" > /dev/null 2>&1 &
+	chromium --window-name=pr-review --new-window "$url" >/dev/null 2>&1 &
 
 	ACTION="$(dunstify --action="default,Open" --timeout=30000 "$title" "$subtitle")"
 
@@ -30,7 +30,7 @@ send_notification() {
 }
 
 check() {
-	all_prs="$(gh pr list --limit=30 --json url,title,author,createdAt,reviewRequests,reviews  | jq -cr ".[] | select(.createdAt | fromdate > (now -3000000))")"
+	all_prs="$(gh pr list --limit=30 --json url,title,author,createdAt,reviewRequests,reviews | jq -cr ".[] | select(.createdAt | fromdate > (now -3000000))")"
 
 	filter_mine_reviewed="select(.author.login == \"$my_github_name\" and (.reviews | length > 0))"
 	filter_review_requested="select(.reviewRequests | map(.login) | contains([\"$my_github_name\"]))"
@@ -38,10 +38,10 @@ check() {
 	echo "$all_prs" | jq -c "$filter_review_requested" | while read -r line; do
 		url=$(echo "$line" | jq -r '.url')
 
-		if grep "^$url\$" "$state_file" >/dev/null 2>&1 ; then
+		if grep "^$url\$" "$state_file" >/dev/null 2>&1; then
 			continue
 		fi
-		echo "$url" >> "$state_file"
+		echo "$url" >>"$state_file"
 
 		# id=$(echo $url | rev | cut -d'/' -f1 | rev)
 		# authorName=$(echo $line | jq -r '.author.name')
@@ -54,10 +54,10 @@ check() {
 	echo "$all_prs" | jq -c "$filter_mine_reviewed" | while read -r line; do
 		url=$(echo "$line" | jq -r '.url')
 
-		if grep "^$url\$" "$state_file" >/dev/null 2>&1 ; then
+		if grep "^$url\$" "$state_file" >/dev/null 2>&1; then
 			continue
 		fi
-		echo "$url" >> "$state_file"
+		echo "$url" >>"$state_file"
 
 		# id=$(echo $url | rev | cut -d'/' -f1 | rev)
 		# authorName=$(echo $line | jq -r '.author.name')
@@ -71,11 +71,11 @@ check() {
 mkdir -p "$tmpdir"
 
 if ! cd "$repository_path"; then
-    echo "Could not cd to '$repository_path'" > "$tmpdir/output"
-    exit 1
+	echo "Could not cd to '$repository_path'" >"$tmpdir/output"
+	exit 1
 fi
 
 while true; do
-    check > "$tmpdir/output" 2>&1 
-    sleep 20
+	check >"$tmpdir/output" 2>&1
+	sleep 20
 done
