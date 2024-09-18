@@ -24,11 +24,11 @@ export HISTTIMEFORMAT='[%F %T %z] '
 
 # https://wiki.archlinux.org/title/SSH_keys#ssh-agent
 # Remember to set `AddKeysToAgent yes` in ~/.ssh/config
-if ! pgrep -u "$USER" ssh-agent > /dev/null; then
-    ssh-agent > "${XDG_RUNTIME_DIR:-"$HOME"}/ssh-agent.env"
+if ! pgrep -u "$USER" ssh-agent >/dev/null; then
+	ssh-agent >"${XDG_RUNTIME_DIR:-"$HOME"}/ssh-agent.env"
 fi
 if [ -z "${SSH_AUTH_SOCK:-}" ]; then
-    . "${XDG_RUNTIME_DIR:-"$HOME"}/ssh-agent.env" >/dev/null
+	. "${XDG_RUNTIME_DIR:-"$HOME"}/ssh-agent.env" >/dev/null
 fi
 
 # Run nvm if it exists
@@ -50,7 +50,7 @@ elif [ -z "${DISPLAY:-}" ] && [ "$XDG_VTNR" = '1' ]; then
 	exec startx
 elif [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
 	# SSH session
-	:  # No-op
+	: # No-op
 else
 	# Swap caps and escape when in tty
 	sudo -n loadkeys ~/.dotfiles/scripts/ttymaps.kmap 2>/dev/null

@@ -6,7 +6,7 @@
 
 shopt -s histappend
 shopt -s no_empty_cmd_completion
-shopt -s dotglob  # Glob hidden files since I have ls='ls -A ...' anyway
+shopt -s dotglob # Glob hidden files since I have ls='ls -A ...' anyway
 
 # Don't put duplicate lines or lines starting with a space in the history
 HISTCONTROL=ignoreboth
@@ -134,8 +134,6 @@ __git_complete gst _git_stash
 alias gstp='git stash pop'
 __git_complete gstp _git_stash
 
-
-
 # Logout of tty after starting x
 alias startx='exec startx'
 alias i3config='$EDITOR ~/.dotfiles/i3'
@@ -161,8 +159,7 @@ unset green
 unset magenta
 unset aqua
 
-
-if command -v zoxide &> /dev/null; then
+if command -v zoxide &>/dev/null; then
 	eval "$(zoxide init bash --cmd zox)"
 	cd() {
 		zox "$@" && ls
@@ -183,14 +180,12 @@ else
 fi
 
 nvm_init_path='/usr/share/nvm/init-nvm.sh'
-if command -v nvm &> /dev/null && [ -f "$nvm_init_path" ]; then
+if command -v nvm &>/dev/null && [ -f "$nvm_init_path" ]; then
 	export NVM_DIR="$HOME/.cache/nvm"
 	. "$nvm_init_path"
 fi
 unset nvm_init_path
 
-
 mkdirc() {
 	mkdir "$@" && cd "$1" || return $?
 }
-
