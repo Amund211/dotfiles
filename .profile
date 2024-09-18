@@ -34,7 +34,10 @@ fi
 # exec startx on login on tty1
 # $XDG_VTNR only works on systems running systemd
 # https://unix.stackexchange.com/questions/521037/what-is-the-environment-variable-xdg-vtnr#answer-521049
-if [ -z "${DISPLAY:-}" ] && [ "$XDG_VTNR" = '1' ]; then
+if [ -n "${DISPLAY:-}" ]; then
+	# Already loaded
+	:
+elif [ -z "${DISPLAY:-}" ] && [ "$XDG_VTNR" = '1' ]; then
 	exec startx
 elif [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
 	# SSH session
