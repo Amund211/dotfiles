@@ -108,7 +108,13 @@ __git_complete gri _git_rebase
 
 # reset     Reset current HEAD to the specified state
 
-alias gsw='git switch'
+gsw() {
+	if [ $# -eq 0 ]; then
+		git branch --show-current && git branch --sort=-committerdate | grep -v "*" | fzf --no-sort --height=20% --reverse | xargs git switch
+		return
+	fi
+	git switch "$@"
+}
 __git_complete gsw _git_switch
 alias gswc='git switch -c'
 __git_complete gswc _git_switch
