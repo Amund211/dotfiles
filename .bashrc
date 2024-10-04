@@ -140,6 +140,8 @@ __git_complete gst _git_stash
 alias gstp='git stash pop'
 __git_complete gstp _git_stash
 
+unset __git_complete
+
 # Logout of tty after starting x
 alias startx='exec startx'
 alias i3config='$EDITOR ~/.dotfiles/i3'
