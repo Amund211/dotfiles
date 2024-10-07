@@ -32,7 +32,7 @@ send_notification() {
 check() {
 	all_prs="$(gh pr list --limit=30 --json url,title,author,createdAt,reviewRequests,reviews | jq -cr ".[] | select(.createdAt | fromdate > (now -3000000))")"
 
-	filter_mine_reviewed="select(.author.login == \"$my_github_name\" and (.reviews | length > 0))"
+	filter_mine_reviewed="select(.author.login == \"$my_github_name\" and any(.reviews[]; .author.login != \"$my_github_name\"))"
 	filter_review_requested="select(.reviewRequests | map(.login) | contains([\"$my_github_name\"]))"
 
 	echo "$all_prs" | jq -c "$filter_review_requested" | while read -r line; do
