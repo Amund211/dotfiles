@@ -6,7 +6,12 @@ repository_path="$1"
 my_github_name="$2"
 
 tmpdir='/tmp/pr-review'
-state_file="$tmpdir/state"
+
+# (Hopefully) Unique string for each repository
+pathId="$(echo "$repository_path" | sed 's/\//-/g')"
+
+state_file="$tmpdir/state-$pathId"
+output_file="$tmpdir/output-$pathId"
 
 send_notification() {
 	title=$1
@@ -71,11 +76,11 @@ check() {
 mkdir -p "$tmpdir"
 
 if ! cd "$repository_path"; then
-	echo "Could not cd to '$repository_path'" >"$tmpdir/output"
+	echo "Could not cd to '$repository_path'" >>"$output_file"
 	exit 1
 fi
 
 while true; do
-	check >"$tmpdir/output" 2>&1
+	check >>"$output_file" 2>&1
 	sleep 20
 done
