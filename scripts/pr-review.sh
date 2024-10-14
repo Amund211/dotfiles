@@ -13,6 +13,11 @@ pathId="$(echo "$repository_path" | sed 's/\//-/g')"
 state_file="$tmpdir/state-$pathId"
 output_file="$tmpdir/output-$pathId"
 
+if [ ! -d "$repository_path" ]; then
+	echo "'$repository_path' is not a directory!" >"$output_file"
+	exit 1
+fi
+
 send_notification() {
 	title=$1
 	subtitle=$2
