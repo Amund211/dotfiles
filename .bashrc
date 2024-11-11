@@ -110,11 +110,15 @@ __git_complete gri _git_rebase
 
 gsw() {
 	if [ $# -eq 0 ]; then
-		git branch --sort=-committerdate --all --format='%(refname:short)' | # All (remote+local) branches, sorted by activity, showing only the refname
-			sed -E 's/^origin\/?//' |                                           # Remove origin prefix from remote branches
-			awk '!x[$0]++ && NF' |                                              # Remove duplicates + empty lines (origin)
-			fzf --no-sort --height=25% --reverse |                              # Let user select
-			xargs git switch                                                    # Switch to the chosen branch
+		{
+			git branch --sort=-committerdate --format '%(refname:short)'            # Local branches, sorted by activity, showing only the refname
+			git branch --sort=-committerdate --remote --format='%(refname:short)' | # Remote branches ...
+				sed -E 's/^origin\/?//' |                                              # Remove origin prefix from remote branches
+				awk 'NF'                                                               # Remove empty lines (origin)
+		} |
+			awk '!x[$0]++' |                       # Remove duplicates
+			fzf --no-sort --height=25% --reverse | # Let user select
+			xargs git switch                       # Switch to the chosen branch
 		return
 	fi
 	git switch "$@"
