@@ -2,7 +2,7 @@
 
 set -eu
 
-version="1.2"
+version="1.3"
 echo "Plentybackup version "$version
 
 if [ "${1-}" = '-h' ] || [ "${1-}" = '--help' ]; then
@@ -41,14 +41,19 @@ sed '/^\(#.*\)\{0,1\}$/d' $backupdirfile |
 	zip -r "$tmpbackupdir/$filename" -@ -x '**/venv/*' 1>/dev/null
 echo "Completed zipping. Size of backup: $(du -h "$tmpbackupdir/$filename" | awk '{print $1}')"
 
-echo "Mounting backupdrive on $backuphost"
-# if ssh $backuphost :; then
-if ssh $backuphost mountbackup; then
-	echo "Mount successful"
+did_mount='false'
+if ! ssh $backuphost "test -d \"$remotebackupdir\""; then
+	echo "Mounting backupdrive on $backuphost"
+	did_mount='true'
+	if ssh $backuphost mountbackup; then
+		echo "Mount successful"
+	else
+		# Error in mount
+		echo "Could not mount backupdrive" >&2
+		exit 1
+	fi
 else
-	# Error in mount
-	echo "Could not mount backupdrive" >&2
-	exit 1
+	echo "Backup directory already exists on $backuphost. Skipping mount."
 fi
 
 echo "Transferring backup"
@@ -58,14 +63,14 @@ else
 	echo "Transfer failed" >&2
 fi
 
-echo "Unmounting backupdrive"
-# if ssh $backuphost :; then
-if ssh $backuphost umountbackup; then
-	# Successfully mounted and unmounted drive
-	echo "Unmount successful"
-else
-	echo "Could not unmount backupdrive" >&2
-	exit 1
+if [ "$did_mount" = 'true' ]; then
+	echo "Unmounting backupdrive"
+	if ssh $backuphost umountbackup; then
+		echo "Unmount successful"
+	else
+		echo "Could not unmount backupdrive" >&2
+		exit 1
+	fi
 fi
 
 # Prompt to clear out $tmpbackupdir if size is > ~1Gb
