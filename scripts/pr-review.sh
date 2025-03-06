@@ -2,6 +2,121 @@
 
 set -u
 
+filter_review_requested() {
+	github_username="${1:-}"
+	if [ -z "$github_username" ]; then
+		echo "No github name provided" >&2
+		exit 1
+	fi
+
+	filter="select(.reviewRequests | map(.login) | contains([\"$github_username\"]))"
+
+	jq -c "$filter"
+}
+
+filter_reviewed() {
+	github_username="${1:-}"
+	if [ -z "$github_username" ]; then
+		echo "No github name provided" >&2
+		exit 1
+	fi
+
+	filter="select(.author.login == \"$github_username\" and any(.reviews[]; .author.login != \"$github_username\"))"
+
+	jq -c "$filter"
+}
+
+run_test() {
+	test_name="${1:-}"
+	if [ -z "$test_name" ]; then
+		echo "ERROR: No test name provided" >&2
+		return 1
+	fi
+	test_input="${2:-}"
+	if [ -z "$test_input" ]; then
+		echo "ERROR: No test input provided - $test_name" >&2
+		return 1
+	fi
+	function_name="${3:-}"
+	if [ -z "$function_name" ]; then
+		echo "ERROR: No function name provided - $test_name" >&2
+		return 1
+	fi
+	github_username="${4:-}"
+	if [ -z "$github_username" ]; then
+		echo "ERROR: No github username provided - $test_name" >&2
+		return 1
+	fi
+	expected_output="${5:-}"
+	if [ -z "$expected_output" ]; then
+		echo "ERROR: No expected output provided - $test_name" >&2
+		return 1
+	fi
+	if [ "$expected_output" != '0' ] && [ "$expected_output" != '1' ]; then
+		echo "ERROR: Expected output must be 0 or 1 - $test_name" >&2
+		return 1
+	fi
+
+	actual_output="$(echo "$test_input" | "$function_name" "$github_username" | wc -l)"
+	if [ "$actual_output" = "$expected_output" ]; then
+		echo "PASS: $test_name" >&2
+	else
+		echo "FAIL: $test_name" >&2
+		return 1
+	fi
+}
+
+tests() {
+	reviewed_by_human='{
+  "author": {
+    "id": "some-id",
+    "is_bot": false,
+    "login": "Amund211",
+    "name": "name"
+  },
+  "createdAt": "2025-03-06T11:20:04Z",
+  "reviewRequests": [
+    {
+      "__typename": "Team",
+      "name": "team name",
+      "slug": "org/team-name"
+    },
+    {
+      "__typename": "User",
+      "login": "username"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "PRR_some-id",
+      "author": {
+        "login": "some-username"
+      },
+      "authorAssociation": "MEMBER",
+      "body": "",
+      "submittedAt": "2025-03-06T10:02:34Z",
+      "includesCreatedEdit": false,
+      "reactionGroups": [],
+      "state": "APPROVED",
+      "commit": {
+        "oid": "some-id"
+      }
+    }
+  ],
+  "title": "some-title",
+  "url": "https://github.com/org/repo/pull/1234"
+}'
+	if ! run_test 'reviewed_by_human -> include' "$reviewed_by_human" 'filter_reviewed' 'Amund211' '1'; then
+		return 1
+	fi
+}
+
+if ! tests; then
+	echo "Tests failed" >&2
+	dunstify --timeout=30000 'PR-review tests failed!'
+	exit 1
+fi
+
 repository_path="$1"
 my_github_name="$2"
 
@@ -42,10 +157,7 @@ send_notification() {
 check() {
 	all_prs="$(gh pr list --limit=30 --json url,title,author,createdAt,reviewRequests,reviews | jq -cr ".[] | select(.createdAt | fromdate > (now -3000000))")"
 
-	filter_mine_reviewed="select(.author.login == \"$my_github_name\" and any(.reviews[]; .author.login != \"$my_github_name\"))"
-	filter_review_requested="select(.reviewRequests | map(.login) | contains([\"$my_github_name\"]))"
-
-	echo "$all_prs" | jq -c "$filter_review_requested" | while read -r line; do
+	echo "$all_prs" | filter_review_requested "$my_github_name" | while read -r line; do
 		url=$(echo "$line" | jq -r '.url')
 
 		if grep "^$url\$" "$state_file" >/dev/null 2>&1; then
@@ -61,7 +173,7 @@ check() {
 		send_notification "Review: $title" "Author: $author" "$url" &
 	done
 
-	echo "$all_prs" | jq -c "$filter_mine_reviewed" | while read -r line; do
+	echo "$all_prs" | filter_reviewed "$my_github_name" | while read -r line; do
 		url=$(echo "$line" | jq -r '.url')
 
 		if grep "^$url\$" "$state_file" >/dev/null 2>&1; then
