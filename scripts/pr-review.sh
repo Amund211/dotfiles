@@ -21,7 +21,7 @@ filter_reviewed() {
 		exit 1
 	fi
 
-	filter="select(.author.login == \"$github_username\" and any(.reviews[]; .author.login != \"$github_username\"))"
+	filter="select(.author.login == \"$github_username\" and any(.reviews[]; .author.login != \"$github_username\" and .author.login != \"copilot-pull-request-reviewer\"))"
 
 	jq -c "$filter"
 }
@@ -107,6 +107,49 @@ tests() {
   "url": "https://github.com/org/repo/pull/1234"
 }'
 	if ! run_test 'reviewed_by_human -> include' "$reviewed_by_human" 'filter_reviewed' 'Amund211' '1'; then
+		return 1
+	fi
+
+	reviewed_by_copilot='{
+  "author": {
+    "id": "some-id",
+    "is_bot": false,
+    "login": "Amund211",
+    "name": "name"
+  },
+  "createdAt": "2025-03-06T11:20:04Z",
+  "reviewRequests": [
+    {
+      "__typename": "Team",
+      "name": "team name",
+      "slug": "org/team-name"
+    },
+    {
+      "__typename": "User",
+      "login": "username"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "PRR_some-id",
+      "author": {
+        "login": "copilot-pull-request-reviewer"
+      },
+      "authorAssociation": "NONE",
+      "body": "## PR Overview\n\nThis PR fixes issues related to ...",
+      "submittedAt": "2025-03-06T11:33:03Z",
+      "includesCreatedEdit": false,
+      "reactionGroups": [],
+      "state": "COMMENTED",
+      "commit": {
+        "oid": "some-id"
+      }
+    }
+  ],
+  "title": "some-title",
+  "url": "https://github.com/org/repo/pull/1234"
+}'
+	if ! run_test 'reviewed_by_copilot -> exclude' "$reviewed_by_copilot" 'filter_reviewed' 'Amund211' '0'; then
 		return 1
 	fi
 }
