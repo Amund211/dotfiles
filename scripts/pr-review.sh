@@ -67,6 +67,33 @@ run_test() {
 }
 
 tests() {
+	not_reviewed='{
+  "author": {
+    "id": "some-id",
+    "is_bot": false,
+    "login": "Amund211",
+    "name": "name"
+  },
+  "createdAt": "2025-03-07T08:21:50Z",
+  "reviewRequests": [
+    {
+      "__typename": "Team",
+      "name": "team name",
+      "slug": "org/team-name"
+    },
+    {
+      "__typename": "User",
+      "login": "username"
+    }
+  ],
+  "reviews": [],
+  "title": "do something",
+  "url": "https://github.com/org/repo/pull/1234"
+}'
+	if ! run_test 'not_reviewed -> exclude' "$not_reviewed" 'filter_reviewed' 'Amund211' '0'; then
+		return 1
+	fi
+
 	reviewed_by_human='{
   "author": {
     "id": "some-id",
@@ -107,6 +134,10 @@ tests() {
   "url": "https://github.com/org/repo/pull/1234"
 }'
 	if ! run_test 'reviewed_by_human -> include' "$reviewed_by_human" 'filter_reviewed' 'Amund211' '1'; then
+		return 1
+	fi
+
+	if ! run_test 'reviewed_by_human, not mine -> exclude' "$reviewed_by_human" 'filter_reviewed' 'someone-else' '0'; then
 		return 1
 	fi
 
