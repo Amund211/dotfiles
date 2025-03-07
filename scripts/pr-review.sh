@@ -183,6 +183,67 @@ tests() {
 	if ! run_test 'reviewed_by_copilot -> exclude' "$reviewed_by_copilot" 'filter_reviewed' 'Amund211' '0'; then
 		return 1
 	fi
+
+	review_requested_from_you='{
+  "author": {
+    "id": "id",
+    "is_bot": false,
+    "login": "author-username",
+    "name": "author name"
+  },
+  "createdAt": "2025-03-07T11:28:30Z",
+  "reviewRequests": [
+    {
+      "__typename": "User",
+      "login": "Amund211"
+    }
+  ],
+  "reviews": [],
+  "title": "some-title",
+  "url": "https://github.com/org/repo/pull/1234"
+}'
+	if ! run_test 'review_requested_from_you -> include' "$review_requested_from_you" 'filter_review_requested' 'Amund211' '1'; then
+		return 1
+	fi
+
+	review_requested_from_someone_else='{
+  "author": {
+    "id": "id",
+    "is_bot": false,
+    "login": "author-username",
+    "name": "author name"
+  },
+  "createdAt": "2025-03-07T11:28:30Z",
+  "reviewRequests": [
+    {
+      "__typename": "User",
+      "login": "someone-else"
+    }
+  ],
+  "reviews": [],
+  "title": "some-title",
+  "url": "https://github.com/org/repo/pull/1234"
+}'
+	if ! run_test 'review_requested_from_someone_else -> exclude' "$review_requested_from_someone_else" 'filter_review_requested' 'Amund211' '0'; then
+		return 1
+	fi
+
+	review_requested_from_no_one='{
+  "author": {
+    "id": "id",
+    "is_bot": false,
+    "login": "author-username",
+    "name": "author name"
+  },
+  "createdAt": "2025-03-07T11:28:30Z",
+  "reviewRequests": [],
+  "reviews": [],
+  "title": "some-title",
+  "url": "https://github.com/org/repo/pull/1234"
+}'
+	if ! run_test 'review_requested_from_no_one -> include' "$review_requested_from_no_one" 'filter_review_requested' 'Amund211' '0'; then
+		return 1
+	fi
 }
 
 if ! tests; then
