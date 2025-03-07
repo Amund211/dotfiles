@@ -184,6 +184,54 @@ tests() {
 		return 1
 	fi
 
+	reviewed_by_copilot_and_human='{
+  "author": {
+    "id": "some-id",
+    "is_bot": false,
+    "login": "Amund211",
+    "name": "name"
+  },
+  "createdAt": "2025-03-07T13:47:23Z",
+  "reviewRequests": [],
+  "reviews": [
+    {
+      "id": "PRR_kwDOBpQFF86e-_NI",
+      "author": {
+        "login": "copilot-pull-request-reviewer"
+      },
+      "authorAssociation": "NONE",
+      "body": "some comment",
+      "submittedAt": "2025-03-07T13:48:45Z",
+      "includesCreatedEdit": false,
+      "reactionGroups": [],
+      "state": "COMMENTED",
+      "commit": {
+        "oid": "some-id"
+      }
+    },
+    {
+      "id": "PRR_some-id",
+      "author": {
+        "login": "human-reviewer"
+      },
+      "authorAssociation": "MEMBER",
+      "body": "",
+      "submittedAt": "2025-03-07T13:59:30Z",
+      "includesCreatedEdit": false,
+      "reactionGroups": [],
+      "state": "APPROVED",
+      "commit": {
+        "oid": "some-id"
+      }
+    }
+  ],
+  "title": "some-title",
+  "url": "https://github.com/org/repo/pull/1234"
+}'
+	if ! run_test 'reviewed_by_copilot_and_human -> include' "$reviewed_by_copilot_and_human" 'filter_reviewed' 'Amund211' '1'; then
+		return 1
+	fi
+
 	review_requested_from_you='{
   "author": {
     "id": "id",
