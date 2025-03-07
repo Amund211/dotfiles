@@ -160,6 +160,11 @@ if ! tests; then
 	exit 1
 fi
 
+echo "Tests passed!" >&2
+if [ "$1" = '-t' ] || [ "$1" = '--test' ]; then
+	exit 0
+fi
+
 repository_path="$1"
 my_github_name="$2"
 
