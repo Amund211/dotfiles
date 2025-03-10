@@ -325,19 +325,21 @@ send_notification() {
 	title=$1
 	subtitle=$2
 	url=$3
+	window_name=$4
+	workspace="${5:-10}"
 
-	chromium --window-name=pr-review --new-window "$url" >/dev/null 2>&1 &
+	chromium --window-name="$window_name" --new-window "$url" >/dev/null 2>&1 &
 
 	ACTION="$(dunstify --action="default,Open" --timeout=30000 "$title" "$subtitle")"
 
 	case "$ACTION" in
 	"default")
 		# Middle click
-		i3-msg workspace 10 >/dev/null 2>&1
+		i3-msg workspace "$workspace" >/dev/null 2>&1
 		;;
 	"2")
 		# Left or right click
-		i3-msg workspace 10 >/dev/null 2>&1
+		i3-msg workspace "$workspace" >/dev/null 2>&1
 		;;
 	esac
 }
@@ -358,7 +360,7 @@ check() {
 		title=$(echo "$line" | jq -r '.title')
 		author=$(echo "$line" | jq -r '.author.login')
 
-		send_notification "Review: $title" "Author: $author" "$url" &
+		send_notification "Review: $title" "Author: $author" "$url" 'pr-review-requested' 9 &
 	done
 
 	echo "$all_prs" | filter_reviewed "$my_github_name" | while read -r line; do
@@ -374,7 +376,7 @@ check() {
 		title=$(echo "$line" | jq -r '.title')
 		author=$(echo "$line" | jq -r '.author.login')
 
-		send_notification "Merge: $title" "Author: $author" "$url" &
+		send_notification "Merge: $title" "Author: $author" "$url" 'pr-review-reviewed' 10 &
 	done
 }
 

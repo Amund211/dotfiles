@@ -305,5 +305,8 @@ workspace $ws10 output HDMI1
 # Start on $ws1
 exec --no-startup-id i3-msg "workspace $ws1"
 
-# assign pr-review to ws10
-assign [title="pr-review"] $ws10
+# assign pr review-requests to ws9
+assign [title="pr-review-requested"] $ws9
+
+# assign reviewed prs to ws10
+assign [title="pr-review-reviewed"] $ws10
