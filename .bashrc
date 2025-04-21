@@ -195,9 +195,9 @@ else
 	}
 fi
 
-nvm_init_path='/usr/share/nvm/init-nvm.sh'
+nvm_init_path="$NVM_INSTALL_DIR/init-nvm.sh"
 if [ -f "$nvm_init_path" ]; then
-	export NVM_DIR="$HOME/.cache/nvm"
+	# NVM_DIR, NVM_INSTALL_DIR set by .profile
 	. "$nvm_init_path"
 fi
 unset nvm_init_path

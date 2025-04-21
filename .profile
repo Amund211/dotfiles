@@ -33,12 +33,11 @@ fi
 
 # Run nvm if it exists
 # NOTE: The installer seems to put it in ~/.nvm, but the AUR package puts it in usr/share
-NVM_INSTALL_DIR='/usr/share/nvm'
+export NVM_INSTALL_DIR='/usr/share/nvm'
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.config/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 if [ -s "$NVM_INSTALL_DIR/nvm.sh" ]; then
-	export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 	. "$NVM_INSTALL_DIR/nvm.sh"
 fi
-unset NVM_INSTALL_DIR
 
 # exec startx on login on tty1
 # $XDG_VTNR only works on systems running systemd
