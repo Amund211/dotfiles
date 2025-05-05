@@ -310,3 +310,11 @@ assign [title="pr-review-requested"] $ws9
 
 # assign reviewed prs to ws10
 assign [title="pr-review-reviewed"] $ws10
+
+# Gamertime setup
+assign [class="^Minecraft Launcher$"] → number 1
+assign [class="^minecraft-launcher$"] → number 1
+assign [class="^discord$"] → number 2
+assign [class="^Minecraft 1.8.9$"] → number 3
+assign [instance="^prism$"] → number 4
+assign [class="^obs$"] → number 10
