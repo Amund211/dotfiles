@@ -11,7 +11,23 @@ if [ $# -gt 3 ]; then
 fi
 
 # Valid entitlements
-set -- cloudfunctions-developer cloudrun-developer cloudsql-editor conda-oslogin custom-cloud-storage-sign-url firebase-admin gke-production monitoring-admin pubsub-editor storage-insights
+set -- \
+	cloudfunctions-developer \
+	cloudrun-developer \
+	cloudscheduler-admin \
+	cloudsql-editor \
+	cloudtask-admin \
+	custom-cloud-storage-sign-url \
+	errorreporting-user \
+	firebase-admin \
+	gke-production \
+	monitoring-admin \
+	pubsub-editor \
+	redis-admin \
+	storage-insights \
+	storage-object-admin \
+	suprema-oslogin \
+	visionai-editor
 
 if [ -z "$entitlement" ]; then
 	echo "Missing entitlement as first argument! Must be one of $*" >&2
