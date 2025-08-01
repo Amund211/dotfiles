@@ -1,0 +1,11 @@
+#!/bin/bash
+
+traceId="$1"
+if [ -z "$traceId" ]; then
+  echo "Usage: $0 <traceId>"
+  exit 1
+fi
+uri="https://console.cloud.google.com/traces/explorer;query=%7B%22plotType%22:%22HEATMAP%22,%22pointConnectionMethod%22:%22GAP_DETECTION%22,%22targetAxis%22:%22Y1%22,%22traceQuery%22:%7B%22resourceContainer%22:%22projects%2Fignite-analytics-202407%22,%22spanDataValue%22:%22SPAN_DURATION%22,%22spanFilters%22:%7B%22attributes%22:%5B%7B%22key%22:%22otel.name%22,%22value%22:%5B%22UpdateContract%22%5D%7D%5D,%22displayNames%22:%5B%5D,%22isRootSpan%22:false,%22kinds%22:%5B%5D,%22maxDuration%22:%22%22,%22minDuration%22:%22%22,%22services%22:%5B%5D,%22status%22:%5B%5D%7D%7D%7D;traceId=$traceId;duration=PT1H?referrer=search&authuser=0&inv=1&invt=Abz59A&project=ignite-analytics-202407"
+
+# open the url in default browser. Replace with your preferred browser if needed
+$BROWSER "$uri"
