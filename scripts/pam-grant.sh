@@ -51,6 +51,24 @@ if [ -z "$justification" ]; then
 	exit 1
 fi
 
+duration_unit="$(printf "%s" "$duration" | tail -c 1)"
+duration_amount="$(echo "$duration" | sed 's/.$//')"
+case "$duration_unit" in
+s)
+	# seconds, no change needed
+	;;
+m)
+	duration="$((duration_amount * 60))s"
+	;;
+h)
+	duration="$((duration_amount * 3600))s"
+	;;
+*)
+	echo "Invalid duration '$duration'! Must end with s, m, or h." >&2
+	exit 1
+	;;
+esac
+
 echo "Requesting entitlement '$chosen_entitlement' for $duration with justification: '$justification'"
 gcloud pam grants create \
 	--entitlement="$entitlement" \
