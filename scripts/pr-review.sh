@@ -2,6 +2,14 @@
 
 set -u
 
+if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+	echo "Usage: $0 [ -t | --test ] <repository-path> <my-github-name>"
+	echo "  -t, --test    Run tests only"
+	echo "  <repository-path>  Path to the local git repository"
+	echo "  <my-github-name>   Your GitHub username"
+	exit 0
+fi
+
 filter_review_requested() {
 	github_username="${1:-}"
 	if [ -z "$github_username" ]; then
