@@ -93,12 +93,12 @@ separator=false
 label=TEMP 
 interval=10
 
+# Battery indicator
+[battery]
+label=⚡ 
+interval=30
+
 # Date Time
 [time]
 command=date '+%Y-%m-%d %H:%M:%S'
 interval=1
-
-# Uptime
-# [time]
-# command=uptime -p
-# interval=3600

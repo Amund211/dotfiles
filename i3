@@ -16,7 +16,7 @@ floating_modifier $mod
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:monospace 12
+font pango:monospace 8
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
@@ -60,14 +60,6 @@ exec --no-startup-id "xbanish -i mod4"
 # Start machine specific init script
 exec --no-startup-id "~/.dotfiles/scripts/init.sh"
 
-# Start notification manager
-exec --no-startup-id "/usr/bin/dunst"
-
-# worktime
-exec --no-startup-id "/home/amund/bin/worktime"
-
-# picom
-exec --no-startup-id "/usr/bin/picom"
 
 ###############################################################
 #		       Window properties
@@ -326,5 +318,3 @@ assign [class="^discord$"] → number 2
 assign [class="^Minecraft 1.8.9$"] → number 3
 assign [instance="^prism$"] → number 4
 assign [class="^obs$"] → number 10
-
-gaps inner 10
