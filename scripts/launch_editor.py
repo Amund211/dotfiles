@@ -20,6 +20,7 @@ except ValueError:  # Max iterable argument is empty
     print("No nvim socket found.", file=sys.stderr)
     sys.exit(errno.ESRCH)  # No such process
 
-attach("socket", path=str(most_recent_socket_path)).command(
-    f"e +{line_number} {file_path}"
-)
+nvim = attach("socket", path=str(most_recent_socket_path))
+
+nvim.command(f"e +{line_number} {file_path}")
+nvim.command(f"normal {column}|")
