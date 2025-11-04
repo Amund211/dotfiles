@@ -396,7 +396,7 @@ send_notification() {
 }
 
 check() {
-	all_prs="$(gh pr list --limit=30 --json url,title,author,createdAt,reviewRequests,reviews | jq -cr ".[] | select(.createdAt | fromdate > (now -3000000))")"
+	all_prs="$(gh pr list --search '-author:app/dependabot' --limit=30 --json url,title,author,createdAt,reviewRequests,reviews | jq -cr ".[] | select(.createdAt | fromdate > (now -3000000))")"
 
 	echo "$all_prs" | filter_review_requested "$my_github_name" | while read -r line; do
 		url=$(echo "$line" | jq -r '.url')
