@@ -18,6 +18,7 @@ set -- \
 	cloudsql-editor \
 	cloudtask-admin \
 	custom-cloud-storage-sign-url \
+	secret-version-adder \
 	errorreporting-user \
 	firebase-admin \
 	gke-production \
