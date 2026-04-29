@@ -98,6 +98,10 @@ GIT_SAFE: dict[str, list[str]] = {
         "origin",
         "upstream",
     ],
+    "pull": [
+        "",
+        "--ff-only",
+    ],
     "ls-remote": [""],
     "remote show": [""],
     "remote -v": [""],
@@ -149,7 +153,7 @@ def git_entries() -> list[str]:
 
 def gh_excluded_entries() -> list[str]:
     """Build gh entries for sandbox.excludedCommands: a single `gh` line."""
-    return ["gh"]
+    return ["gh *"]
 
 
 def git_excluded_entries() -> list[str]:
@@ -169,7 +173,7 @@ def git_excluded_entries() -> list[str]:
                 if scoped not in seen:
                     seen.add(scoped)
                     out.append(scoped)
-    return out
+    return [f"{entry} *" for entry in out]
 
 
 def render(groups: list[list[str]], wrap: bool = True) -> str:
