@@ -69,6 +69,7 @@ GH_SAFE_ACTIONS: list[str] = [
     "repo view",
     "run view",
     "run list",
+    "run download",
     "release view",
     "release list",
     "label list",
