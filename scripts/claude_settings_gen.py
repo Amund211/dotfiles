@@ -108,6 +108,11 @@ GIT_SAFE: dict[str, list[str]] = {
     "remote get-url": ["origin", "upstream"],
 }
 
+GIT_UNSAFE_OUTSIDE_SANDBOX: list[str] = [
+    "push",
+]
+
+
 # Pre-subcommand scope flag forms for git. {path} is filled with
 # PATH_PLACEHOLDER.
 GIT_SCOPE_PREFIXES: list[str] = [
@@ -173,6 +178,20 @@ def git_excluded_entries() -> list[str]:
                 if scoped not in seen:
                     seen.add(scoped)
                     out.append(scoped)
+
+    for unsafe in GIT_UNSAFE_OUTSIDE_SANDBOX:
+        unsafe_cmd = f"git {unsafe}"
+        if unsafe_cmd not in seen:
+            seen.add(unsafe_cmd)
+            out.append(unsafe_cmd)
+        for prefix in GIT_SCOPE_PREFIXES:
+            for path in SAFE_GIT_PATHS:
+                scope = prefix.format(path=path)
+                scoped_unsafe = f"git {scope} {unsafe}"
+                if scoped_unsafe not in seen:
+                    seen.add(scoped_unsafe)
+                    out.append(scoped_unsafe)
+
     return [f"{entry} *" for entry in out]
 
 
