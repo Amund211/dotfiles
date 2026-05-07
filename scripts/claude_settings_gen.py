@@ -68,6 +68,7 @@ GH_SAFE_ACTIONS: list[str] = [
     "pr checks",
     "repo view",
     "run view",
+    "run watch",
     "run list",
     "run download",
     "release view",
@@ -75,6 +76,7 @@ GH_SAFE_ACTIONS: list[str] = [
     "label list",
     "workflow view",
     "workflow list",
+    "cache list",
 ]
 
 # Pre-subcommand scope flag forms for gh. Each {repo} is filled with
