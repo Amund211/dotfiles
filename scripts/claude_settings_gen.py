@@ -99,6 +99,8 @@ GIT_SAFE: dict[str, list[str]] = {
         "--all",
         "--all --prune",
         "origin",
+        "origin master",
+        "origin master --quiet",
         "upstream",
     ],
     "pull": [
