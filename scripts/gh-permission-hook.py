@@ -7,6 +7,31 @@ From https://github.com/dyad-sh/dyad/blob/main/.claude/hooks/gh-permission-hook.
 This hook enforces a security policy for `gh` commands, auto-approving safe
 operations and blocking dangerous ones.
 
+SIMPLIFIED: this copy auto-approves ONLY read-only `gh api` calls (REST GET +
+graphql queries). Everything else (other gh subcommands, gh api writes, graphql
+mutations, anything with shell metacharacters) falls through to Claude Code's
+normal permission flow. The broader allow/deny rules below are kept for
+reference but are unreachable.
+
+Settings.json wiring (PreToolUse):
+
+    {
+      "hooks": {
+        "PreToolUse": [
+          {
+            "matcher": "Bash",
+            "hooks": [
+              {
+                "type": "command",
+                "command": "/home/amund/.dotfiles/scripts/gh-permission-hook.py",
+                "timeout": 5000
+              }
+            ]
+          }
+        ]
+      }
+    }
+
 ALLOWED (auto-approved):
 ------------------------
 1. Read-only gh commands:
@@ -344,6 +369,7 @@ def main():
     # Other gh commands with shell metacharacters are blocked for safety
     if not (normalized_cmd.startswith("gh pr ") or normalized_cmd.startswith("gh issue ")):
         if contains_shell_injection(command):
+            sys.exit(0)  # SIMPLIFIED: fall through instead of deny
             decision = make_deny_decision(
                 "Command contains shell metacharacters that could allow injection"
             )
@@ -357,6 +383,7 @@ def main():
             print(json.dumps(decision))
         sys.exit(0)
 
+    sys.exit(0)  # SIMPLIFIED: only gh api auto-approved
     # Check other gh commands
     decision = check_gh_command(normalized_cmd)
     if decision:
@@ -456,7 +483,7 @@ def check_gh_api_command(cmd: str) -> Optional[dict]:
 
     # Check if command has input data (implies write operation)
     has_input = bool(re.search(r"(--input[=\s]|--field[=\s]|-f[=\s]|-F[=\s])", cmd))
-
+    if has_input or (method and method != "GET"): return None  # SIMPLIFIED: writes fall through
     # Check allowed endpoints FIRST before blocking based on method
     # This allows explicit POST to allowed endpoints like PR comment replies
     if endpoint:
@@ -544,6 +571,7 @@ def check_gh_graphql_command(cmd: str) -> Optional[dict]:
             r'addPullRequestReviewComment|addPullRequestReview)\b'  # word boundary ensures full name match
             r'(?!\s*:)'                # NOT followed by colon (would make it an alias)
         )
+        return None  # SIMPLIFIED: all graphql mutations fall through (readonly only)
         if re.search(allowed_pr_mutations, cmd, re.IGNORECASE):
             return make_allow_decision("PR review mutation auto-approved")
 
