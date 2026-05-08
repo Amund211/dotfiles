@@ -2,6 +2,8 @@
 """
 GitHub CLI Permission Hook
 
+From https://github.com/dyad-sh/dyad/blob/main/.claude/hooks/gh-permission-hook.py
+
 This hook enforces a security policy for `gh` commands, auto-approving safe
 operations and blocking dangerous ones.
 
