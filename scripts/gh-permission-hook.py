@@ -690,5 +690,39 @@ def make_ask_decision(reason: str) -> dict:
     }
 
 
+TEST_CASES = [
+    # (command, expected permissionDecision; None = fall through, no output)
+    ("gh api repos/foo/bar",                                          "allow"),
+    ("gh api repos/foo/bar --method=GET",                             "allow"),
+    ("gh api repos/foo/bar | jq .name",                               "allow"),
+    ("gh api graphql -f query='query { viewer { login } }'",          "allow"),
+    ("gh api repos/foo/bar -f title=hello",                           None),
+    ("gh api repos/foo/bar --method POST",                            None),
+    ("gh api repos/foo/bar; rm -rf /",                                None),
+    ("gh api graphql -f query='mutation { addStar(input:{}) {} }'",   None),
+    ("gh pr view 123",                                                None),
+    ("gh repo delete foo",                                            None),
+]
+
+
+def run_tests() -> int:
+    import subprocess
+    fail = 0
+    for cmd, expected in TEST_CASES:
+        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": cmd}})
+        out = subprocess.run(
+            [sys.executable, __file__],
+            input=payload, capture_output=True, text=True, check=False,
+        ).stdout.strip()
+        actual = json.loads(out)["hookSpecificOutput"]["permissionDecision"] if out else None
+        ok = actual == expected
+        fail += not ok
+        print(f"[{'PASS' if ok else 'FAIL'}] expected={expected!s:>5}  actual={actual!s:>5}  {cmd}")
+    print(f"\n{len(TEST_CASES) - fail}/{len(TEST_CASES)} passed")
+    return 1 if fail else 0
+
+
 if __name__ == "__main__":
+    if "--test" in sys.argv:
+        sys.exit(run_tests())
     main()
