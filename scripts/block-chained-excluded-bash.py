@@ -4,9 +4,15 @@ PreToolUse hook: deny Bash calls that combine a sandbox-excluded command with
 shell chaining/loops/substitution.
 
 Why: commands listed in `sandbox.excludedCommands` run OUTSIDE the sandbox.
-If they're chained with `&&`, `||`, `;`, `|`, `$(...)`, backticks, `<(...)`,
-or for/while loops, the rest of the chain inherits that escape hatch. We want
-the excluded list to mean "simple invocation only".
+If they're chained with `&&`, `||`, `;`, `$(...)`, backticks, `<(...)`,
+`>(...)`, or for/while loops, the rest of the chain inherits that escape
+hatch. We want the excluded list to mean "simple invocation only".
+
+Exceptions (allowed):
+  - File redirection with bare `>` / `>>` / `<` (not in CHAINING_TOKENS).
+  - Piping (`|`) into stdout-only filters listed in SAFE_PIPE_TARGETS, e.g.
+    `gh pr view 123 | head -20`. The whole pipeline still runs outside the
+    sandbox, but these filters only consume stdin and emit stdout.
 
 Wire into ~/.claude/settings.json (merge into existing top-level keys):
 
@@ -94,6 +100,17 @@ CHAINING_TOKENS = [
 ]
 CHAINING_RE = re.compile("|".join(t[0] for t in CHAINING_TOKENS))
 
+# Same set minus single-pipe — used to detect chaining that we never allow.
+NON_PIPE_CHAINING_RE = re.compile(r"&&|\|\||;|\$\(|`|<\(|>\(|\n")
+
+# Commands that only consume stdin and produce stdout. Safe to allow after a
+# pipe even when the upstream command runs outside the sandbox.
+SAFE_PIPE_TARGETS = {
+    "head", "tail", "grep", "egrep", "fgrep", "rg",
+    "wc", "sort", "uniq", "cut", "tr", "awk", "sed",
+    "jq", "yq", "cat", "less", "more", "column", "rev", "nl",
+}
+
 
 def strip_quoted_regions(s: str) -> str:
     """Best-effort: drop content inside '...', "...", and `...` so we don't
@@ -139,6 +156,43 @@ def find_excluded_prefix(cleaned: str, prefixes: list[str]) -> str | None:
     return None
 
 
+def split_pipes(cleaned: str) -> list[str]:
+    """Split on `|` but not `||`. Quoted regions must already be stripped."""
+    parts: list[str] = []
+    buf: list[str] = []
+    i, n = 0, len(cleaned)
+    while i < n:
+        if cleaned[i] == "|":
+            if i + 1 < n and cleaned[i + 1] == "|":
+                buf.append("||")
+                i += 2
+                continue
+            parts.append("".join(buf))
+            buf = []
+            i += 1
+            continue
+        buf.append(cleaned[i])
+        i += 1
+    parts.append("".join(buf))
+    return parts
+
+
+def all_post_pipes_safe(cleaned: str) -> bool:
+    """True iff every segment after the first `|` starts with a SAFE_PIPE_TARGETS
+    command. If there are no pipes, vacuously True."""
+    parts = split_pipes(cleaned)
+    if len(parts) <= 1:
+        return True
+    for seg in parts[1:]:
+        m = re.match(r"\s*([A-Za-z0-9_./-]+)", seg)
+        if not m:
+            return False
+        cmd_name = os.path.basename(m.group(1))
+        if cmd_name not in SAFE_PIPE_TARGETS:
+            return False
+    return True
+
+
 def decide(command: str, prefixes: list[str]) -> tuple[str, str | None]:
     """Return ("allow", None) or ("deny", reason). Pure function — no I/O."""
     if not command:
@@ -149,9 +203,14 @@ def decide(command: str, prefixes: list[str]) -> tuple[str, str | None]:
     matched = find_excluded_prefix(cleaned, prefixes)
     if not matched:
         return "allow", None
+    # Allow when the only chaining is `|` into stdout-only filters.
+    if not NON_PIPE_CHAINING_RE.search(cleaned) and all_post_pipes_safe(cleaned):
+        return "allow", None
     reason = (
         f"'{matched}' commands must run without chaining or loops. "
-        f"Run the commands in the same order, but as separate Bash tool calls."
+        f"Run the commands in the same order, but as separate Bash tool calls. "
+        f"Allowed exception: piping into stdout-only filters "
+        f"(head, tail, grep, wc, jq, sort, uniq, cut, tr, awk, sed, ...)."
     )
     return "deny", reason
 
@@ -215,7 +274,13 @@ _TEST_CASES = [
     ('echo "gcloud foo && bar"', "allow"),  # chaining is inside quotes
     ('git commit -m "add gcloud config"', "allow"),  # not an excluded prefix
     ("gcloud logging read --filter='severity>=ERROR'", "allow"),
-    ("gh pr view 123 | head -20", "deny"),
+    ("gh pr view 123 | head -20", "allow"),  # safe pipe filter
+    ("gh pr view 123 | tail -5", "allow"),
+    ("gh issue list | jq .", "allow"),
+    ("gcloud projects list | grep foo | wc -l", "allow"),  # chain of safe filters
+    ("gh issue list > issues.txt", "allow"),  # bare > redirection
+    ("gh issue list | xargs rm", "deny"),  # xargs is not stdout-only
+    ("gh pr view 123 | head && rm bar", "deny"),  # mix of pipe and &&
     ("$(gcloud projects list)", "deny"),  # command substitution
     ("git -C /home/amund/git/ignite/main fetch && echo done", "deny"),
     ("git push origin master", "allow"),  # no-wildcard prefix, simple call
