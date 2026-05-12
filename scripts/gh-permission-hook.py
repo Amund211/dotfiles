@@ -696,6 +696,7 @@ TEST_CASES = [
     ("gh api repos/foo/bar --method=GET",                             "allow"),
     ("gh api repos/foo/bar | jq .name",                               "allow"),
     ("gh api graphql -f query='query { viewer { login } }'",          "allow"),
+    ("gh api repos/repo/file.go --jq '.content' | base64 -d",         "allow"),
     ("gh api repos/foo/bar -f title=hello",                           None),
     ("gh api repos/foo/bar --method POST",                            None),
     ("gh api repos/foo/bar; rm -rf /",                                None),
