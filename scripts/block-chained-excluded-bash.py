@@ -201,6 +201,7 @@ def decide(command: str, prefixes: list[str]) -> tuple[str, str | None]:
     """Return ("allow", None) or ("deny", reason). Pure function — no I/O."""
     if not command:
         return "allow", None
+    command = command.replace("\\\n", " ")
     cleaned = strip_quoted_regions(command)
     if not find_chaining(cleaned):
         return "allow", None
@@ -291,6 +292,7 @@ _TEST_CASES = [
     ("git push origin master && echo done", "deny"),  # no-wildcard prefix, chained
     ("git commit && git push", "deny"),
     ("ls && git push", "deny"),
+    ("gh api repos/foo/bar --jq .content \\\n       | base64 -d", "allow"),
 ]
 
 
