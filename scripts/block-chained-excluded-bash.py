@@ -109,6 +109,7 @@ SAFE_PIPE_TARGETS = {
     "head", "tail", "grep", "egrep", "fgrep", "rg",
     "wc", "sort", "uniq", "cut", "tr", "awk", "sed",
     "jq", "yq", "cat", "less", "more", "column", "rev", "nl",
+    "base64",
 }
 
 
