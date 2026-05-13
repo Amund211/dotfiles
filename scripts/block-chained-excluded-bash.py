@@ -110,6 +110,9 @@ SAFE_PIPE_TARGETS = {
     "wc", "sort", "uniq", "cut", "tr", "awk", "sed",
     "jq", "yq", "cat", "less", "more", "column", "rev", "nl",
     "base64",
+    "fmt", "fold", "paste", "expand", "unexpand", "tac",
+    "od", "xxd", "hexdump", "strings",
+    "md5sum", "sha256sum", "sha1sum", "shasum", "cksum",
 }
 
 
