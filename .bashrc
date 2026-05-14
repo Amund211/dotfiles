@@ -141,6 +141,8 @@ __git_complete gpf _git_push
 
 alias gu='git pull'
 __git_complete gu _git_pull
+alias guri='git pull --rebase=interactive'
+__git_complete guri _git_pull
 
 # Other
 alias gst='git stash'
