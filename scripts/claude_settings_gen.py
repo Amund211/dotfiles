@@ -41,12 +41,16 @@ SAFE_GH_REPOS: list[str] = [
     "Amund211/rainbow",
     "Amund211/flashlight",
     "Amund211/prism",
+    "Amund211/nvim",
+    "Amund211/dotfiles",
 ]
 
 SAFE_GIT_PATHS: list[str] = [
     "/home/amund/git/overlay/rainbow",
     "/home/amund/git/overlay/flashlight",
     "/home/amund/git/overlay/prism",
+    "/home/amund/.config/nvim",
+    "/home/amund/.dotfiles",
 ]
 
 
