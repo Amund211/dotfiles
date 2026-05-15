@@ -112,6 +112,8 @@ GIT_SAFE: dict[str, list[str]] = {
     "pull": [
         "",
         "--ff-only",
+        "--ff-only origin master",
+        "--ff-only origin main",
     ],
     "ls-remote": [""],
     "remote show": [""],
