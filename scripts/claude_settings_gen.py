@@ -43,6 +43,10 @@ SAFE_GH_REPOS: list[str] = [
     "Amund211/prism",
     "Amund211/nvim",
     "Amund211/dotfiles",
+    "ignite-analytics/main",
+    "ignite-analytics/go-packages",
+    "ignite-analytics/dataform",
+    "ignite-analytics/void",
 ]
 
 SAFE_GIT_PATHS: list[str] = [
@@ -51,6 +55,12 @@ SAFE_GIT_PATHS: list[str] = [
     "/home/amund/git/overlay/prism",
     "/home/amund/.config/nvim",
     "/home/amund/.dotfiles",
+    "/home/amund/git/ignite/main",
+    "/home/amund/git/ignite/go-packages",
+    "/home/amund/git/ignite/dataform",
+    "/home/amund/git/ignite/agent-main",
+    "/home/amund/git/ignite/agent-main/main",
+    "/home/amund/git/ignite/agent-main/*",
 ]
 
 
