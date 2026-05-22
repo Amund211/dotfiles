@@ -45,6 +45,26 @@ else
 	}
 fi
 
+# __git_complete sets __git_cmd_idx=0, so completion fns that read
+# ${words[__git_cmd_idx]} to identify the subcommand (e.g. _git_pull via
+# __git_complete_remote_or_refspec) see the alias name instead of pull/push/
+# fetch — breaking 2nd-arg completion (`gu origin <tab>`). Splice in the real
+# subcommand so they behave as if invoked through git directly.
+__git_complete_alias_dispatch() {
+	local cur words cword prev
+	local __git_cmd_idx=1
+	_get_comp_words_by_ref -n =: cur words cword prev
+	words=("git" "$1" "${words[@]:1}")
+	((cword++))
+	"_git_$1"
+}
+__git_complete_alias() {
+	local wrapper="__git_wrap_alias_$1"
+	eval "$wrapper () { __git_complete_alias_dispatch $2; }"
+	complete -o bashdefault -o default -o nospace -F "$wrapper" "$1" 2>/dev/null \
+		|| complete -o default -o nospace -F "$wrapper" "$1"
+}
+
 alias g='git'
 __git_complete g __git_main
 
@@ -54,11 +74,11 @@ __git_complete g __git_main
 
 # work on the current change (see also: git help everyday)
 alias ga='git add'
-__git_complete ga _git_add
+__git_complete_alias ga add
 alias gau='git add -u'
-__git_complete gau _git_add
+__git_complete_alias gau add
 alias gap='git add --patch'
-__git_complete gap _git_add
+__git_complete_alias gap add
 
 # mv        Move or rename a file, a directory, or a symlink
 # restore   Restore working tree files
@@ -68,43 +88,43 @@ __git_complete gap _git_add
 # bisect    Use binary search to find the commit that introduced a bug
 
 alias gd='git diff'
-__git_complete gd _git_diff
+__git_complete_alias gd diff
 alias gds='git diff --staged'
-__git_complete gds _git_diff
+__git_complete_alias gds diff
 
 alias gg='git grep'
-__git_complete gg _git_grep
+__git_complete_alias gg grep
 
 alias gl='git log'
-__git_complete gl _git_log
+__git_complete_alias gl log
 
 alias gsh='git show'
-__git_complete gsh _git_show
+__git_complete_alias gsh show
 
 alias gs='git status'
-__git_complete gs _git_status
+__git_complete_alias gs status
 
 # grow, mark and tweak your common history
 alias gb='git branch'
-__git_complete gb _git_branch
+__git_complete_alias gb branch
 
 alias gc='git commit'
-__git_complete gc _git_commit
+__git_complete_alias gc commit
 alias gca='git commit --amend'
-__git_complete gca _git_commit
+__git_complete_alias gca commit
 alias gcp='git commit --patch'
-__git_complete gcp _git_commit
+__git_complete_alias gcp commit
 alias gcu='git commit -u'
-__git_complete gcu _git_commit
+__git_complete_alias gcu commit
 alias gcau='git commit --amend -u'
-__git_complete gcau _git_commit
+__git_complete_alias gcau commit
 
 # merge     Join two or more development histories together
 
 alias gr='git rebase'
-__git_complete gr _git_rebase
+__git_complete_alias gr rebase
 alias gri='git rebase --interactive'
-__git_complete gri _git_rebase
+__git_complete_alias gri rebase
 
 # reset     Reset current HEAD to the specified state
 
@@ -123,32 +143,32 @@ gsw() {
 	fi
 	git switch "$@"
 }
-__git_complete gsw _git_switch
+__git_complete_alias gsw switch
 alias gswc='git switch -c'
-__git_complete gswc _git_switch
+__git_complete_alias gswc switch
 
 alias gt='git tag'
-__git_complete gt _git_tag
+__git_complete_alias gt tag
 
 # collaborate (see also: git help workflows)
 alias gf='git fetch'
-__git_complete gf _git_fetch
+__git_complete_alias gf fetch
 
 alias gp='git push'
-__git_complete gp _git_push
+__git_complete_alias gp push
 alias gpf='git push --force-with-lease'
-__git_complete gpf _git_push
+__git_complete_alias gpf push
 
 alias gu='git pull'
-__git_complete gu _git_pull
+__git_complete_alias gu pull
 alias guri='git pull --rebase=interactive'
-__git_complete guri _git_pull
+__git_complete_alias guri pull
 
 # Other
 alias gst='git stash'
-__git_complete gst _git_stash
+__git_complete_alias gst stash
 alias gstp='git stash pop'
-__git_complete gstp _git_stash
+__git_complete_alias gstp stash
 
 unset __git_complete
 
