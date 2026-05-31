@@ -91,6 +91,7 @@ GH_SAFE_ACTIONS: list[str] = [
     "workflow view",
     "workflow list",
     "cache list",
+    "secret list",
 ]
 
 # Pre-subcommand scope flag forms for gh. Each {repo} is filled with
