@@ -161,6 +161,8 @@ __git_complete_alias gpf push
 
 alias gu='git pull'
 __git_complete_alias gu pull
+alias gur='git pull --rebase'
+__git_complete_alias gur pull
 alias guri='git pull --rebase=interactive'
 __git_complete_alias guri pull
 
