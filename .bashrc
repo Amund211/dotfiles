@@ -219,10 +219,6 @@ else
 	}
 fi
 
-if command -v temporal &>/dev/null; then
-	source <(temporal completion bash)
-fi
-
 nvm_init_path="$NVM_INSTALL_DIR/init-nvm.sh"
 if [ -f "$nvm_init_path" ]; then
 	# NVM_DIR, NVM_INSTALL_DIR set by .profile
