@@ -61,8 +61,8 @@ __git_complete_alias_dispatch() {
 __git_complete_alias() {
 	local wrapper="__git_wrap_alias_$1"
 	eval "$wrapper () { __git_complete_alias_dispatch $2; }"
-	complete -o bashdefault -o default -o nospace -F "$wrapper" "$1" 2>/dev/null \
-		|| complete -o default -o nospace -F "$wrapper" "$1"
+	complete -o bashdefault -o default -o nospace -F "$wrapper" "$1" 2>/dev/null ||
+		complete -o default -o nospace -F "$wrapper" "$1"
 }
 
 alias g='git'
