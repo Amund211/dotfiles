@@ -483,7 +483,9 @@ def check_gh_api_command(cmd: str) -> Optional[dict]:
 
     # Check if command has input data (implies write operation)
     has_input = bool(re.search(r"(--input[=\s]|--field[=\s]|-f[=\s]|-F[=\s])", cmd))
-    if has_input or (method and method != "GET"): return None  # SIMPLIFIED: writes fall through
+    # With an explicit GET, -f/-F fields become URL query parameters (read-only);
+    # without it, gh api treats fields as a POST body
+    if (has_input or method) and method != "GET": return None  # SIMPLIFIED: writes fall through
     # Check allowed endpoints FIRST before blocking based on method
     # This allows explicit POST to allowed endpoints like PR comment replies
     if endpoint:
@@ -703,6 +705,7 @@ TEST_CASES = [
     ("gh api graphql -f query='mutation { addStar(input:{}) {} }'",   None),
     ("gh pr view 123",                                                None),
     ("gh repo delete foo",                                            None),
+    ("gh api -X GET search/issues -f q='repo:org/repo is:pr author:username merged:2026-03-01..2026-06-12' -F per_page=1 --jq '.total_count'", "allow"),
 ]
 
 
