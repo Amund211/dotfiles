@@ -5,9 +5,12 @@
 #   orange = waiting on you (permission / input);  green = finished.
 # Green dots auto-dismiss once you focus their workspace.
 #
-# Perf: i3 is queried ONLY when a green dot is present (to read the focused
-# workspace). Orange dots render straight from the workspace number recorded in
-# the state file by claude-i3-notify.sh, so idle / orange-only updates need no i3.
+# Dead sessions (terminal killed without a graceful exit) are pruned via a cheap
+# per-window xdotool existence check — no full-tree query.
+#
+# Perf: the i3 tree is never queried; get_workspaces runs ONLY when a green dot is
+# present (to read the focused workspace). Orange dots render straight from the
+# workspace number recorded in the state file by claude-i3-notify.sh.
 
 dir=${XDG_RUNTIME_DIR:-/tmp}/claude-i3
 shopt -s nullglob
@@ -20,8 +23,14 @@ have_done=0
 for f in "$dir"/*; do
   case ${f##*/} in *.log) continue ;; esac
   [ -f "$f" ] || continue
-  read -r st ws _ < "$f" 2>/dev/null || continue
+  read -r st ws wid < "$f" 2>/dev/null || continue
   [ -n "${st:-}" ] || continue
+  # Prune sessions whose terminal window is gone (an ungraceful exit that never
+  # fired SessionEnd; graceful exits clear themselves). Cheap per-window X check,
+  # so we still never query the full i3 tree.
+  if [ -z "${wid:-}" ] || ! xdotool getwindowname "$wid" >/dev/null 2>&1; then
+    rm -f "$f"; continue
+  fi
   states+=("$st"); wss+=("${ws:-?}"); paths+=("$f")
   [ "$st" = done ] && have_done=1
 done
