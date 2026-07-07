@@ -46,4 +46,4 @@ done
 
 [ ${#segs[@]} -gt 0 ] || { echo; exit 0; }
 body=$(printf '%s\n' "${segs[@]}" | sort -n -t'|' -k1,1 | cut -d'|' -f2- | paste -sd' ' -)
-echo "cc $body"
+echo "$body"
