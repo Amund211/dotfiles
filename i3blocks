@@ -35,6 +35,14 @@ command=date '+%V'
 interval=once
 interval=1
 
+# Claude Code session status: orange dot = waiting on you, green = done.
+# Dots are tagged with the workspace number; green auto-clears when you focus it.
+[claude_status]
+command=$HOME/.dotfiles/scripts/claude-status-block.sh
+markup=pango
+interval=1
+signal=12
+
 # Volume indicator
 
 [volume]
