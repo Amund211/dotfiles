@@ -229,3 +229,9 @@ unset nvm_init_path
 mkdirc() {
 	mkdir "$@" && cd "$1" || return $?
 }
+
+agent-main() {
+	unset -f cd
+	(setsid git -C /home/amund/git/ignite/agent-main/main pull >/dev/null 2>&1 </dev/null &)
+	builtin cd ~/git/ignite/agent-main || exit 1
+}
