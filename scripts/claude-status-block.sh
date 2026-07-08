@@ -11,6 +11,10 @@
 # Perf: the i3 tree is never queried; get_workspaces runs ONLY when a green dot is
 # present (to read the focused workspace). Orange dots render straight from the
 # workspace number recorded in the state file by claude-i3-notify.sh.
+#
+# Left-click (i3blocks sets $BLOCK_BUTTON on click): cycle to the NEXT workspace
+# needing attention (waiting or done), in numeric order relative to the focused
+# one, wrapping around — so repeated clicks step through all of them.
 
 dir=${XDG_RUNTIME_DIR:-/tmp}/claude-i3
 shopt -s nullglob
@@ -44,16 +48,35 @@ if [ "$have_done" = 1 ]; then
 fi
 
 segs=()
+wait_wss=(); done_wss=()
 for i in "${!states[@]}"; do
   st=${states[$i]}; ws=${wss[$i]}
   if [ "$st" = done ]; then
     if [ -n "$focused" ] && [ "$ws" = "$focused" ]; then rm -f "${paths[$i]}"; continue; fi
     col=$DONE
+    [ "$ws" != "?" ] && [ "$ws" != "-1" ] && done_wss+=("$ws")
   else
     col=$WAIT
+    [ "$ws" != "?" ] && [ "$ws" != "-1" ] && wait_wss+=("$ws")
   fi
   segs+=("$ws|<span foreground=\"$col\">●</span>$ws")
 done
+
+# On left-click, focus the next workspace needing attention after the focused one
+# (numeric order, wrapping around); repeated clicks cycle through them.
+if [ "${BLOCK_BUTTON:-}" = 1 ]; then
+  att=()
+  [ ${#wait_wss[@]} -gt 0 ] && att+=("${wait_wss[@]}")
+  [ ${#done_wss[@]} -gt 0 ] && att+=("${done_wss[@]}")
+  if [ ${#att[@]} -gt 0 ]; then
+    cur=$focused
+    [ -n "$cur" ] || cur=$(i3-msg -t get_workspaces 2>/dev/null | jq -r '.[] | select(.focused).num // empty' 2>/dev/null) || cur=""
+    ordered=$(printf '%s\n' "${att[@]}" | sort -nu)
+    target=$(printf '%s\n' "$ordered" | awk -v c="${cur:--999}" '$1 > c { print; exit }')
+    [ -n "$target" ] || target=$(printf '%s\n' "$ordered" | head -1)
+    i3-msg workspace number "$target" >/dev/null 2>&1
+  fi
+fi
 
 [ ${#segs[@]} -gt 0 ] || { echo; exit 0; }
 printf '%s\n' "${segs[@]}" | sort -n -t'|' -k1,1 | cut -d'|' -f2- | paste -sd' ' -
