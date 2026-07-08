@@ -1,63 +1,184 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Installs the dotfiles by copying a template sourcing from this directory to the
-# correct locations. If the files already exist, a backup is created.
+# Installs these dotfiles by making sure each well-known config location sources
+# the tracked copy in this repo. For every target we ensure the relevant
+# import/source line (from templates/) is present -- your other content is left
+# alone. A fresh target is created from the template; an existing target is
+# backed up before we touch it. Re-running is a no-op once everything is in
+# place. Pass --dry-run to preview every change without touching disk.
 
 set -eu
 
-make_backup() {
-	# make_backup <file>
-
-	if [ -z "${1:-}" ]; then
-		echo 'Missing argument <file>' >&2
-		exit 1
+# Colors, only when the relevant stream is a terminal and NO_COLOR is unset
+# or empty (https://no-color.org).
+C_GREEN=''
+C_RESET=''
+C_ORANGE=''
+C_RED=''
+C_ERESET=''
+C_GRAY=''
+if [ -z "${NO_COLOR:-}" ]; then
+	if [ -t 1 ]; then
+		C_GREEN=$'\033[32m'
+		C_GRAY=$'\033[90m'
+		C_RESET=$'\033[0m'
 	fi
-
-	if [ -f "$1" ]; then
-		tmpfile=$(mktemp "$1.XXXXXX")
-		echo "[WARNING]: File '$1' already exists, making a backup as '$tmpfile'" >&2
-		cp -a "$1" "$tmpfile"
+	if [ -t 2 ]; then
+		C_ORANGE=$'\033[33m'
+		C_RED=$'\033[31m'
+		C_ERESET=$'\033[0m'
 	fi
-}
-
-install_template() {
-	# install_template <install_location> <template_file>
-	install_location="${1:-}"
-	template_file="${2:-}"
-
-	if [ -z "$install_location" ]; then
-		echo 'Missing argument <install_location>' >&2
-		exit 1
-	fi
-
-	if [ -z "$template_file" ]; then
-		echo 'Missing argument <template_file>' >&2
-		exit 1
-	elif [ ! -f "$template_file" ]; then
-		echo 'Argument <template_file> either missing or not a regular file' >&2
-		exit 1
-	fi
-
-	make_backup "$install_location"
-
-	cp "$template_file" "$install_location"
-	echo "Successfully copied '$template_file' to '$install_location'"
-}
-
-
-install_template "$HOME/.bashrc" "templates/.bashrc"
-install_template "$HOME/.vimrc" "templates/.vimrc"
-install_template "$HOME/.xinitrc" "templates/.xinitrc"
-
-# Alacritty only reads its config, so a stub that imports the repo copy keeps
-# live reload working while the real config stays tracked in ~/.dotfiles.
-mkdir -p "$HOME/.config/alacritty"
-install_template "$HOME/.config/alacritty/alacritty.toml" "templates/alacritty.toml"
-
-install_template "$HOME/.profile" "templates/.profile"
-# Make sure that .bash_profile doesn't override our .profile
-bash_profile="$HOME/.bash_profile"
-if [ -f "$bash_profile" ]; then
-	make_backup "$bash_profile"
-	rm "$bash_profile"
 fi
+
+# create -> an action was (or would be) taken: green tag.
+# info   -> neutral status, no action either way: plain tag.
+# skip   -> a no-op, nothing changed: whole line dimmed gray, just an FYI.
+create() { printf '%s[CREATE]%s %s\n' "$C_GREEN" "$C_RESET" "$*"; }
+info() { printf '[INFO] %s\n' "$*"; }
+skip() { printf '%s[SKIP] %s%s\n' "$C_GRAY" "$*" "$C_RESET"; }
+warn() { printf '%s[WARNING]%s %s\n' "$C_ORANGE" "$C_ERESET" "$*" >&2; }
+err() { printf '%s[ERROR]%s %s\n' "$C_RED" "$C_ERESET" "$*" >&2; }
+
+# Argument parsing. --dry-run / -n previews every change without touching disk.
+DRY_RUN=0
+for arg in "$@"; do
+	case "$arg" in
+	-n | --dry-run) DRY_RUN=1 ;;
+	-h | --help)
+		printf 'Usage: %s [--dry-run|-n]\n\n' "$0"
+		printf 'Makes each well-known config location source the tracked copy in\n'
+		printf 'this repo, by ensuring the import/source line from templates/ is\n'
+		printf 'present. Existing files are backed up before being touched, and any\n'
+		printf 'content you already had is preserved. Safe to re-run.\n\n'
+		printf '  -n, --dry-run   Show what would happen without changing anything.\n'
+		printf '  -h, --help      Show this help and exit.\n'
+		exit 0
+		;;
+	*)
+		err "Unknown argument: $arg (try --help)"
+		exit 1
+		;;
+	esac
+done
+
+REPO="$(cd "$(dirname "$0")" && pwd)"
+
+# The template stubs hard-code ~/.dotfiles paths, so the repo must live there.
+if [ "$REPO" != "$HOME/.dotfiles" ]; then
+	err "Expected this repo to live at '$HOME/.dotfiles', but it is at '$REPO'. The template stubs hard-code ~/.dotfiles, so aborting."
+	exit 1
+fi
+
+# make_backup <file>
+# Copies <file> aside to a unique .bak name and reports where. Only called on a
+# real run, right before we modify <file>.
+make_backup() {
+	local backup
+	backup="$(mktemp -u "${1}.bak.XXXXXX")"
+	cp -a "$1" "$backup"
+	warn "Backed up existing $1 -> '$backup'"
+}
+
+# install_template <target> <template>
+# Ensures <target> sources this repo. The lines in <template> that reference
+# ~/.dotfiles are the "import lines" that must be present in <target>:
+#   - target missing        -> create it from the whole template
+#   - import lines present   -> nothing to do (note if it has other content too)
+#   - import lines missing   -> back up target, replace it with the template
+install_template() {
+	local target template import_lines missing line tmpl_name
+	target="$1"
+	template="$2"
+	tmpl_name="templates/$(basename "$template")"
+
+	if [ ! -f "$template" ]; then
+		err "template '$template' is missing; skipping $target"
+		return 0
+	fi
+
+	# The import/source line(s): everything in the template referencing the
+	# repo. The rest of the template is just comments/boilerplate.
+	import_lines="$(grep -F '.dotfiles' "$template" || true)"
+	if [ -z "$import_lines" ]; then
+		err "$tmpl_name has no ~/.dotfiles import line; skipping $target"
+		return 0
+	fi
+
+	# Fresh install: drop in the whole template verbatim.
+	if [ ! -e "$target" ]; then
+		if [ "$DRY_RUN" = 1 ]; then
+			create "[dry-run] would create $target from $tmpl_name"
+			return 0
+		fi
+		mkdir -p "$(dirname "$target")"
+		cp "$template" "$target"
+		create "Created $target from $tmpl_name"
+		return 0
+	fi
+
+	# Which import lines are not already in the target?
+	missing=""
+	while IFS= read -r line; do
+		[ -n "$line" ] || continue
+		grep -qF -- "$line" "$target" || missing="$missing$line"$'\n'
+	done <<EOF
+$import_lines
+EOF
+
+	# Already sourcing the repo -> idempotent no-op. We know the import line is
+	# present; a literal (byte-for-byte) compare then tells us whether the file
+	# is otherwise pristine. Anything cmp flags -- reordering, extra lines,
+	# whitespace or edits -- counts as "differs", and we leave it as-is.
+	if [ -z "$missing" ]; then
+		if cmp -s "$template" "$target"; then
+			skip "$target already matches $tmpl_name, nothing to do"
+		else
+			skip "$target already sources the repo, leaving it as-is"
+			info "  ($target differs from $tmpl_name -- extra/reordered lines or edits; left untouched since the import line is present)"
+		fi
+		return 0
+	fi
+
+	# Import line(s) absent: the file does not source the repo, so back it up
+	# and replace it wholesale with the template.
+	if [ "$DRY_RUN" = 1 ]; then
+		create "[dry-run] would back up $target and replace it with $tmpl_name"
+		info "  ($target exists but does not source the repo; your version is backed up, not merged)"
+		return 0
+	fi
+	make_backup "$target"
+	cp "$template" "$target"
+	create "Replaced $target with $tmpl_name (your previous version was backed up)"
+}
+
+# remove_bash_profile
+# A ~/.bash_profile would shadow ~/.profile for login bash shells, so the
+# desired state is that it is absent. Remove it (backed up first) if present.
+remove_bash_profile() {
+	local bp
+	bp="$HOME/.bash_profile"
+
+	if [ ! -e "$bp" ] && [ ! -L "$bp" ]; then
+		skip "$bp not present, nothing to do"
+		return 0
+	fi
+
+	if [ "$DRY_RUN" = 1 ]; then
+		create "[dry-run] would back up and remove $bp (it would otherwise shadow ~/.profile)"
+		return 0
+	fi
+	make_backup "$bp"
+	rm "$bp"
+	create "Removed $bp so it no longer shadows ~/.profile"
+}
+
+if [ "$DRY_RUN" = 1 ]; then
+	info "DRY RUN - showing what would happen; no changes will be made."
+fi
+
+install_template "$HOME/.bashrc" "$REPO/templates/.bashrc"
+install_template "$HOME/.profile" "$REPO/templates/.profile"
+install_template "$HOME/.vimrc" "$REPO/templates/.vimrc"
+install_template "$HOME/.xinitrc" "$REPO/templates/.xinitrc"
+install_template "$HOME/.config/alacritty/alacritty.toml" "$REPO/templates/alacritty.toml"
+remove_bash_profile
