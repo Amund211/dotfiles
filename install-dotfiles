@@ -49,6 +49,11 @@ install_template "$HOME/.bashrc" "templates/.bashrc"
 install_template "$HOME/.vimrc" "templates/.vimrc"
 install_template "$HOME/.xinitrc" "templates/.xinitrc"
 
+# Alacritty only reads its config, so a stub that imports the repo copy keeps
+# live reload working while the real config stays tracked in ~/.dotfiles.
+mkdir -p "$HOME/.config/alacritty"
+install_template "$HOME/.config/alacritty/alacritty.toml" "templates/alacritty.toml"
+
 install_template "$HOME/.profile" "templates/.profile"
 # Make sure that .bash_profile doesn't override our .profile
 bash_profile="$HOME/.bash_profile"

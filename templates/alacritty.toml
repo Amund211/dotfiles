@@ -1,0 +1,4 @@
+# ~/.config/alacritty/alacritty.toml
+
+[general]
+import = ["~/.dotfiles/alacritty.toml"]
