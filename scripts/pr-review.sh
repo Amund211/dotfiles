@@ -490,16 +490,33 @@ launch_review() {
 
 	prompt="$(printf '/review %s\n\nYou are in a throwaway git worktree on branch %s, checked out to this PR head; edit freely, it does not touch the main checkout.' "$url" "$branch")"
 
+	# Reap the worktree/branch/ref once claude exits so they don't pile up and
+	# eventually fill /tmp (mirrors prune_review_state). Values go through env, not the
+	# sh -c string, so arbitrary PR titles/prompts can't break quoting. If the window is
+	# force-killed (SIGHUP) rather than exited, cleanup is skipped - the pre-add remove
+	# above and startup prune_review_state catch those leftovers.
 	# --title is what i3 assigns on (map time); claude's --name retitles afterwards.
 	# --settings enableAllProjectMcpServers auto-approves the repo's .mcp.json servers,
 	# which otherwise prompt in every fresh worktree.
-	alacritty \
+	env \
+		REVIEW_REPO="$repository_path" \
+		REVIEW_WORKTREE="$worktree_path" \
+		REVIEW_BRANCH="$branch" \
+		REVIEW_REF="$pr_ref" \
+		REVIEW_CLAUDE_NAME="Review($number): $title" \
+		REVIEW_PROMPT="$prompt" \
+		alacritty \
 		--title "$window_name" \
 		--working-directory "$worktree_path" \
-		-e claude \
-		--settings '{"enableAllProjectMcpServers":true}' \
 		--name "Review($number): $title" \
-		"$prompt" \
+		-e sh -c '
+claude --settings "{\"enableAllProjectMcpServers\":true}" --name "$REVIEW_CLAUDE_NAME" "$REVIEW_PROMPT"
+git -C "$REVIEW_REPO" worktree remove --force "$REVIEW_WORKTREE" 2>/dev/null
+rm -rf "$REVIEW_WORKTREE"
+git -C "$REVIEW_REPO" worktree prune
+git -C "$REVIEW_REPO" branch -D "$REVIEW_BRANCH" 2>/dev/null
+git -C "$REVIEW_REPO" update-ref -d "$REVIEW_REF" 2>/dev/null
+' \
 		>/dev/null 2>&1 &
 }
 
