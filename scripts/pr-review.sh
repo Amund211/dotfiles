@@ -508,7 +508,6 @@ launch_review() {
 		alacritty \
 		--title "$window_name" \
 		--working-directory "$worktree_path" \
-		--name "Review($number): $title" \
 		-e sh -c '
 claude --settings "{\"enableAllProjectMcpServers\":true}" --name "$REVIEW_CLAUDE_NAME" "$REVIEW_PROMPT"
 git -C "$REVIEW_REPO" worktree remove --force "$REVIEW_WORKTREE" 2>/dev/null
@@ -517,7 +516,7 @@ git -C "$REVIEW_REPO" worktree prune
 git -C "$REVIEW_REPO" branch -D "$REVIEW_BRANCH" 2>/dev/null
 git -C "$REVIEW_REPO" update-ref -d "$REVIEW_REF" 2>/dev/null
 ' \
-		>/dev/null 2>&1 &
+		>/dev/null &
 }
 
 prune_review_state() {
