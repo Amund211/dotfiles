@@ -93,6 +93,13 @@ if ! file "$firmware_file_input" | grep -i uf2 -q; then
 	exit 1
 fi
 
+# Mounting needs root later on. Prime the sudo ticket now so we don't stall for a
+# password while the keyboard is sitting in bootloader mode.
+if ! sudo -v; then
+	echo 'Could not acquire sudo privileges, needed to mount the storage device the keyboard presents in bootloader mode' >&2
+	exit 1
+fi
+
 rh_block_device="$(wait_for_block_device 'Plug in the RIGHT half and put it in bootloader mode (Magic + Æ)')"
 upload_firmware "$firmware_file_input" "$rh_block_device"
 
