@@ -315,6 +315,14 @@ assign [title="^pr-review-requested"] $ws9
 assign [class="^pr-review-reviewed$"] $ws10
 assign [title="^pr-review-reviewed"] $ws10
 
+# Stack the review workspaces so each window gets a full-width title row instead of an
+# Nth of one - a PR title is unreadable in a squished tab. The first matching window
+# converts the workspace and later ones attach inside it, so this settles on a single
+# stacked container. Both rules are needed: ws10 can receive a browser window with no
+# terminal alongside it.
+for_window [class="^pr-review-"] layout stacking
+for_window [title="^pr-review-"] layout stacking
+
 # Gamertime setup
 assign [class="^Minecraft Launcher$"] → number 1
 assign [class="^minecraft-launcher$"] → number 1
