@@ -430,6 +430,9 @@ tmpdir='/tmp/pr-review'
 # (Hopefully) Unique string for each repository
 pathId="$(echo "$repository_path" | sed 's/\//-/g')"
 
+# Three repos are polled in parallel, so a bare PR number is ambiguous in window titles.
+repo_name="${repository_path##*/}"
+
 state_file="$tmpdir/state-$pathId"
 output_file="$tmpdir/output-$pathId"
 
@@ -442,10 +445,13 @@ send_notification() {
 	title=$1
 	subtitle=$2
 	url=$3
-	window_name=$4
+	window_title=$4
 	workspace="${5:-10}"
 
-	chromium --window-name="$window_name" --new-window "$url" >/dev/null 2>&1 &
+	# --window-name freezes WM_NAME for the life of the window, so it has to carry the
+	# identifying information itself - the page title never gets through. It keeps the
+	# pr-review-<queue> prefix the i3 rules match on. See docs/i3-pr-review-windows.md.
+	chromium --window-name="$window_title" --new-window "$url" >/dev/null 2>&1 &
 
 	ACTION="$(dunstify --action="default,Open" --timeout=30000 "$title" "$subtitle")"
 
@@ -467,7 +473,6 @@ launch_review() {
 	title=$3
 	window_class=$4
 
-	repo_name="${repository_path##*/}"
 	worktree_base="/tmp/claude-1000/pr-review-$repo_name"
 	worktree_path="$worktree_base/pr-$number"
 	branch="pr-review-$number"
@@ -506,7 +511,7 @@ launch_review() {
 		REVIEW_WORKTREE="$worktree_path" \
 		REVIEW_BRANCH="$branch" \
 		REVIEW_REF="$pr_ref" \
-		REVIEW_CLAUDE_NAME="Review($number): $title" \
+		REVIEW_CLAUDE_NAME="$repo_name#$number $title" \
 		REVIEW_PROMPT="$prompt" \
 		alacritty \
 		--class "$window_class,prr-$repo_name-$number" \
@@ -559,7 +564,7 @@ check() {
 		title=$(echo "$line" | jq -r '.title')
 		author=$(echo "$line" | jq -r '.author.login')
 
-		send_notification "Review: $title" "Author: $author" "$url" 'pr-review-requested' 9 &
+		send_notification "Review: $title" "Author: $author" "$url" "pr-review-requested $repo_name#$number $title" 9 &
 		if [ -n "$claude_review" ]; then
 			launch_review "$number" "$url" "$title" 'pr-review-requested'
 		fi
@@ -588,10 +593,11 @@ check() {
 		seen reviewed "$url" && continue
 		mark_seen reviewed "$url"
 
+		number=$(echo "$line" | jq -r '.number')
 		title=$(echo "$line" | jq -r '.title')
 		author=$(echo "$line" | jq -r '.author.login')
 
-		send_notification "Merge: $title" "Author: $author" "$url" 'pr-review-reviewed' 10 &
+		send_notification "Merge: $title" "Author: $author" "$url" "pr-review-reviewed $repo_name#$number $title" 10 &
 	done
 }
 
