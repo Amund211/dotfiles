@@ -305,11 +305,15 @@ workspace $ws10 output HDMI1
 # Start on $ws1
 exec --no-startup-id i3-msg "workspace $ws1"
 
-# assign pr review-requests to ws9
-assign [title="pr-review-requested"] $ws9
+# assign pr review-requests to ws9, reviewed prs to ws10 (see docs/i3-pr-review-windows.md).
+# Review terminals match on WM_CLASS, which never changes, so their title stays free for
+# claude's --name. The browser windows have no settable class, so they keep matching on the
+# title prefix that pr-review.sh freezes with chromium --window-name.
+assign [class="^pr-review-requested$"] $ws9
+assign [title="^pr-review-requested"] $ws9
 
-# assign reviewed prs to ws10
-assign [title="pr-review-reviewed"] $ws10
+assign [class="^pr-review-reviewed$"] $ws10
+assign [title="^pr-review-reviewed"] $ws10
 
 # Gamertime setup
 assign [class="^Minecraft Launcher$"] → number 1

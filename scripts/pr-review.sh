@@ -465,7 +465,7 @@ launch_review() {
 	number=$1
 	url=$2
 	title=$3
-	window_name=$4
+	window_class=$4
 
 	repo_name="${repository_path##*/}"
 	worktree_base="/tmp/claude-1000/pr-review-$repo_name"
@@ -495,7 +495,10 @@ launch_review() {
 	# sh -c string, so arbitrary PR titles/prompts can't break quoting. If the window is
 	# force-killed (SIGHUP) rather than exited, cleanup is skipped - the pre-add remove
 	# above and startup prune_review_state catch those leftovers.
-	# --title is what i3 assigns on (map time); claude's --name retitles afterwards.
+	# --class is what i3 assigns on: WM_CLASS is set once at map time and never changes,
+	# unlike the title. Passing --title instead would also make alacritty ignore every
+	# later title change, so claude's --name would never reach the title bar. The instance
+	# half of --class is a per-PR handle for i3 criteria. See docs/i3-pr-review-windows.md.
 	# --settings enableAllProjectMcpServers auto-approves the repo's .mcp.json servers,
 	# which otherwise prompt in every fresh worktree.
 	env \
@@ -506,7 +509,7 @@ launch_review() {
 		REVIEW_CLAUDE_NAME="Review($number): $title" \
 		REVIEW_PROMPT="$prompt" \
 		alacritty \
-		--title "$window_name" \
+		--class "$window_class,prr-$repo_name-$number" \
 		--working-directory "$worktree_path" \
 		-e sh -c '
 claude --settings "{\"enableAllProjectMcpServers\":true}" --name "$REVIEW_CLAUDE_NAME" "$REVIEW_PROMPT"
