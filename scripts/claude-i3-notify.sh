@@ -16,11 +16,38 @@
 #                           SessionEnd: working or gone)
 #   log     -> no state change; append the notification message to notifications.log
 #              (catch-all Notification hook, to spot unclassified notification types).
+#
+# The same orange/green dot is also painted onto the session window's i3 title bar via
+# a per-window `title_format` override, so a workspace holding several sessions (e.g. the
+# stacked pr-review terminals on ws9/ws10) shows which one wants you, not just that
+# something on that workspace does. `%title` keeps claude's own live title, so nothing
+# races over WM_NAME - which is also why nothing else may set title_format on these
+# windows: the clear path resets it to plain "%title".
+#
+# Title dots are tracked in $dir/titles/<sid> — deliberately NOT the state file, which
+# the blocklet deletes when a green dot auto-dismisses on workspace focus. A title dot
+# must outlive that: focusing ws9 shouldn't erase which of eight windows finished. It
+# clears when the session is actually used again (clear) — and the marker means the
+# frequent clear calls cost one file test, not an i3-msg.
 set -euo pipefail
 
 mode=${1:?usage: claude-i3-notify.sh <waiting|done|clear|log>}
 dir=${XDG_RUNTIME_DIR:-/tmp}/claude-i3
-mkdir -p "$dir" || exit 0
+titles=$dir/titles
+mkdir -p "$titles" || exit 0
+
+# Same colors as the [claude_status] blocklet.
+WAIT_COLOR="#FFA500"; DONE_COLOR="#33CC33"
+
+# Pango attribute values must be single-quoted: a nested double quote ends i3's
+# command string and the rest parses as a second, bogus command.
+set_title_dot() {
+  i3-msg "[id=$2] title_format \"<span foreground='$1'>●</span> %title\"" >/dev/null 2>&1 || true
+}
+
+clear_title_dot() {
+  i3-msg "[id=$1] title_format \"%title\"" >/dev/null 2>&1 || true
+}
 
 raw=$(cat)
 
@@ -37,9 +64,15 @@ sid=$(printf '%s' "$raw" | jq -r '.session_id // empty' 2>/dev/null || true)
 [ -n "$sid" ] || exit 0
 
 f=$dir/$sid
+marker=$titles/$sid
 changed=
 case $mode in
   clear)
+    if [ -e "$marker" ]; then
+      read -r _ wid <"$marker" 2>/dev/null || wid=
+      [ -n "${wid:-}" ] && clear_title_dot "$wid"
+      rm -f "$marker"
+    fi
     if [ -e "$f" ]; then rm -f "$f"; changed=1; fi
     ;;
   waiting|done)
@@ -51,6 +84,17 @@ case $mode in
     new="$mode ${ws:-?} ${WINDOWID:-0}"
     old=$(cat "$f" 2>/dev/null || true)
     if [ "$old" != "$new" ]; then printf '%s\n' "$new" >"$f"; changed=1; fi
+
+    if [ "${WINDOWID:-0}" != 0 ]; then
+      want="$mode ${WINDOWID}"
+      if [ "$(cat "$marker" 2>/dev/null || true)" != "$want" ]; then
+        case $mode in
+          waiting) set_title_dot "$WAIT_COLOR" "$WINDOWID" ;;
+          done)    set_title_dot "$DONE_COLOR" "$WINDOWID" ;;
+        esac
+        printf '%s\n' "$want" >"$marker"
+      fi
+    fi
     ;;
 esac
 

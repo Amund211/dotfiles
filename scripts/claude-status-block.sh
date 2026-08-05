@@ -20,12 +20,14 @@ dir=${XDG_RUNTIME_DIR:-/tmp}/claude-i3
 shopt -s nullglob
 WAIT="#FFA500"; DONE="#33CC33"
 
-# Load per-session state files ("<mode> <ws> <windowid>"); skip the *.log files
-# that live in the same dir (else they get read as bogus sessions).
+# Load per-session state files ("<mode> <ws> <windowid>"); skip the *.log files and the
+# titles/ dir that live alongside (else they get read as bogus sessions). The per-window
+# title dots in titles/ are owned by claude-i3-notify.sh and intentionally survive the
+# green auto-dismiss below — they clear when that session is next used.
 states=(); wss=(); paths=()
 have_done=0
 for f in "$dir"/*; do
-  case ${f##*/} in *.log) continue ;; esac
+  case ${f##*/} in *.log | titles) continue ;; esac
   [ -f "$f" ] || continue
   read -r st ws wid < "$f" 2>/dev/null || continue
   [ -n "${st:-}" ] || continue
@@ -33,7 +35,7 @@ for f in "$dir"/*; do
   # fired SessionEnd; graceful exits clear themselves). Cheap per-window X check,
   # so we still never query the full i3 tree.
   if [ -z "${wid:-}" ] || ! xdotool getwindowname "$wid" >/dev/null 2>&1; then
-    rm -f "$f"; continue
+    rm -f "$f" "$dir/titles/${f##*/}"; continue
   fi
   states+=("$st"); wss+=("${ws:-?}"); paths+=("$f")
   [ "$st" = done ] && have_done=1

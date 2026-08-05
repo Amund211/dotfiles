@@ -237,23 +237,29 @@ well not be annoying enough in practice to justify that. Revisit after living wi
 
 ## 6. Interaction with the title-dots work
 
-`/tmp/claude-1000/claude-i3-title-dots-report.md` + `.patch` (patch still applies:
-`git -C ~/.dotfiles apply --check` → rc 0; `claude-i3-notify.sh` is currently reverted).
+Landed as step 4, in `scripts/claude-i3-notify.sh` and `scripts/claude-status-block.sh`.
 
 - **Complementary, no rework needed.** It renders the dot as
   `title_format "<span foreground='#FFA500'>●</span> %title"`, which composes with whatever
   WM_NAME is. It deliberately does not touch WM_NAME, so the routing change is orthogonal.
-- **It removes that report's stated limitation.** Its follow-up — "dots say which window,
-  not which PR" — exists only because the terminal is titled `pr-review-requested` to satisfy
-  the title-based `assign`. Routing on `--class` frees WM_NAME, so claude's `--name` makes
-  the row read `● Review(46517): web: upgrade MUI from 7 to 9`. No extra retitle needed.
-- **One conflict to settle: a single owner of `title_format`.** The hook resets to `"%title"`
-  on `clear`. If `launch_review()` also set a static prefix via `title_format` (option F),
-  the reset would wipe it. Keep PR identity in WM_NAME and leave `title_format` to the dots.
+  Markup renders because `i3` line 19 is `font pango:monospace 12`, and pango attribute
+  values must be **single**-quoted — a nested `"` ends i3's command string and the remainder
+  parses as a second, bogus command.
+- **Steps 1-3 removed its stated limitation.** Its follow-up — "dots say which window, not
+  which PR" — existed only because the terminal was titled `pr-review-requested` to satisfy
+  the title-based `assign`. With `--class` routing and claude's `--name`, the row reads
+  `● main#46517 web: upgrade MUI from 7 to 9`. No extra retitle needed.
+- **`title_format` has exactly one owner: the hook.** It resets to plain `"%title"` on
+  `clear`, so anything else that set a static prefix through `title_format` would be wiped.
+  Identity belongs in WM_NAME.
 - **Stacking amplifies it.** Dots sit in full-width stack rows instead of a bar split eight
-  ways, which is where they're currently invisible.
-- Dots only cover claude windows; browser windows never get one. The adjacency step in §4
-  means the flagged claude row is always next to its browser row.
+  ways, which is where they were invisible.
+- The dot marker lives in `titles/<sid>`, not the state file, because the blocklet deletes a
+  `done` state when its workspace is focused. Confirmed live during the step-4 test: at
+  `done` the state file was gone within the same second (ws4 was focused) while the marker
+  and the green dot survived — which is the whole reason for the separate file.
+- Dots only cover claude windows; browser windows never get one. Phase 2's adjacency would
+  put the flagged claude row next to its browser row.
 
 ## Sandbox notes
 
