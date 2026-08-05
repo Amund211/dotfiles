@@ -170,26 +170,47 @@ windows takes precedence over assignment rules". But it appends to the *focused*
 (so it steals focus) and one placeholder swallows one window — a fixed pool, no good for an
 open-ended stream of PRs.
 
-## 4. Recommendation
+## 4. The plan
 
-**Flat stacking on ws9/ws10, route on WM_CLASS, put the information in the title.**
+**Flat stacking on ws9/ws10, terminal routed on WM_CLASS, browser routed on a title prefix,
+all the identifying information in the title.** Stacking over tabbed because every window
+then gets a full-width title row, so a long PR title fits; tabbed divides one bar N ways,
+which is the same squish rotated.
 
-- Stacking over tabbed: every window gets a full-width title row, so a long PR title fits.
-  Tabbed divides one bar N ways — the same squish, just horizontal.
-- i3 config:
-      assign [class="^pr-review-requested$"] $ws9
-      assign [class="^pr-review-reviewed$"]  $ws10
-      for_window [class="^pr-review-"] layout stacking
-- terminal: `alacritty --class pr-review-requested,prr-<n>-claude`, drop `--title`.
-  claude's `--name "Review(<n>): <title>"` then owns the whole title row.
-- browser: keep `--window-name`, but give it a stable short prefix and real content, e.g.
-  `--window-name="⇢ #46517 web: upgrade MUI from 7 to 9"` with `assign [title="^⇢ "] $ws9`
-  (`⇠` for ws10). Title criteria are PCRE, so the prefix routes and the rest is free text.
-  Keep the prefix short — `title_format` has no way to strip it, so it costs characters on
-  every row.
-- optional adjacency without nesting: mark the claude window, then
-  `[title="^⇢ #46517"] move container to mark prr46517`. That puts the pair next to each
-  other in the stack (one keypress apart) while keeping both titles fully rendered.
+Four steps, one commit each.
+
+1. **Terminal routes on WM_CLASS.** `alacritty --class pr-review-requested,prr-<repo>-<n>`,
+   with `--title` dropped so claude's `--name` can reach the title bar at all (see §2).
+   i3 gains `assign [class="^pr-review-requested$"] $ws9` and the `-reviewed` equivalent for
+   `$ws10`; the pre-existing title rules stay for the browser and get anchored.
+2. **Stacking.** `for_window [class="^pr-review-"] layout stacking` for the terminals plus
+   `for_window [title="^pr-review-"] layout stacking` for the browser windows. Either one is
+   enough to convert the workspace once it fires, but ws10 can receive a browser with no
+   terminal (the merge notification), so both are needed.
+3. **Informative titles.** Browser `--window-name="pr-review-requested <repo>#<n> <title>"`
+   and claude `--name "<repo>#<n> <title>"`. The repo matters because three repos are polled.
+   Keeping `pr-review-requested` as the browser's *prefix* means step 2's rules and the
+   `assign` rules need no further change — and unanchored i3 regexes match anywhere, so the
+   existing rules already tolerate the longer title. It costs ~20 characters of a full-width
+   row, which is affordable.
+4. **Per-window status dots.** Land the `title_format` work (§6). It only becomes useful once
+   the rows are distinguishable, and stacking is what makes the dot visible.
+
+### Phase 2 (agreed, deliberately not implemented yet)
+
+**Pair each PR's two rows by adjacency, not by nesting.** After both windows map, mark the
+terminal and move the browser to that mark:
+
+    i3-msg '[instance="^prr-main-46517$"] mark --replace prr-main-46517'
+    i3-msg '[title="^pr-review-requested main#46517"] move container to mark prr-main-46517'
+
+Both commands are criteria-based, so neither steals focus. The pair then sits one keypress
+apart in the stack with both titles still fully rendered — which is the readable half of the
+tabbed-group idea without either of its two problems above.
+
+Deferred because it needs a wait-for-map loop in `launch_review()` (the browser is spawned
+from `send_notification()`, so the two halves have to rendezvous), and the interleaving may
+well not be annoying enough in practice to justify that. Revisit after living with steps 1-4.
 
 ## 5. Alternatives to the whole approach
 
