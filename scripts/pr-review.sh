@@ -506,7 +506,9 @@ launch_review() {
 	# half of --class is a per-PR handle for i3 criteria. See docs/i3-pr-review-windows.md.
 	# --settings enableAllProjectMcpServers auto-approves the repo's .mcp.json servers,
 	# which otherwise prompt in every fresh worktree.
-	env \
+	# setsid puts the terminal in its own session rather than the poller's process group,
+	# so restarting or killing the poller cannot take a review session down with it.
+	setsid -f env \
 		REVIEW_REPO="$repository_path" \
 		REVIEW_WORKTREE="$worktree_path" \
 		REVIEW_BRANCH="$branch" \
@@ -524,7 +526,7 @@ git -C "$REVIEW_REPO" worktree prune
 git -C "$REVIEW_REPO" branch -D "$REVIEW_BRANCH" 2>/dev/null
 git -C "$REVIEW_REPO" update-ref -d "$REVIEW_REF" 2>/dev/null
 ' \
-		>/dev/null &
+		>/dev/null
 }
 
 prune_review_state() {

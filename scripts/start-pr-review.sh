@@ -134,16 +134,13 @@ stop_one() {
 	pids=$(pids_for "$repo" | tr '\n' ' ')
 	[ -n "$pids" ] || return 0
 
+	# Signal the poller only, never its process group. A poller's process group also
+	# contains every review terminal it has spawned - sh has no job control, so those
+	# children stay in its group - and killing the group destroys in-flight review
+	# sessions. An orphaned gh or git child of an interrupted poll exits on its own
+	# within seconds, which is a much cheaper problem.
 	for pid in $pids; do
-		# Instances this script started are session leaders, so signalling the process
-		# group also takes down whatever gh or git child is mid-poll. Instances started
-		# some other way are not, so fall back to the pid alone.
-		pgid=$(ps -o pgid= -p "$pid" 2>/dev/null | tr -d ' ')
-		if [ -n "$pgid" ] && [ "$pgid" = "$pid" ]; then
-			kill -TERM "-$pid" 2>/dev/null || true
-		else
-			kill -TERM "$pid" 2>/dev/null || true
-		fi
+		kill -TERM "$pid" 2>/dev/null || true
 	done
 
 	waited=0
