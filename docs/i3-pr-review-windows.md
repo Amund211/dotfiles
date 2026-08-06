@@ -210,8 +210,11 @@ Four steps, one commit each.
 **Pair each PR's two rows by adjacency, not by nesting.** After both windows map, mark the
 terminal and move the browser to that mark:
 
-    i3-msg '[instance="^prr-main-46517$"] mark --replace prr-main-46517'
-    i3-msg '[class="^Chromium$" title="^main#46517 "] move container to mark prr-main-46517'
+Move the **terminal onto the browser**, not the other way round — see the focus finding
+below for why the direction matters:
+
+    i3-msg '[class="^Chromium$" title="^main#46517 "] mark --replace prr-main-46517'
+    i3-msg '[instance="^prr-main-46517$"] move container to mark prr-main-46517'
 
 **Verified on a scratch workspace** (i3 4.25.1, four windows spawned interleaved
 `Aterm, Bterm, Aweb, Bweb` into one stacked container):
@@ -222,8 +225,32 @@ terminal and move the browser to that mark:
   §3's two objections (unreadable `T[…]` container decorations, groups nesting inside each
   other) came from the `split v` variant, which is **not needed**. Both rows keep rendering
   their own full titles, dots included.
-- **No focus steal.** The focused workspace and focused window were unchanged across two
-  mark+move pairs, exactly as §3 predicted for criteria-based commands.
+- **It DOES move focus — to the container it moves.** An earlier reading of this as "no focus
+  steal" was wrong: it only looked at *global* focus while the scratch workspace was hidden.
+  Re-measured, the workspace's own focus head jumps to the moved window (`labC` → `labA`),
+  and `i3-dump-log` shows why:
+
+      _con_move_to_con:1414   Re-attaching container to 0x…aae2100
+      _con_attach:201         Inserting con = 0x…bc1ba0 after con 0x…b9ca0
+      con_focus:252           con_focus = 0x…bc1ba0      <- the MOVED container
+      con_focus:252           con_focus = 0x…aae2100  … up the scratch-ws chain
+      con_focus:252           con_focus = 0x…ac46b70     <- then a second chain…
+      con_focus:252           con_focus = 0x…ab2dac0  … which is workspace "4"
+
+  i3 focuses the moved container, then re-focuses the visible workspace because the move
+  targeted a hidden one. **On a visible ws9 there is nothing to restore to**, so the moved
+  window keeps focus and the stacked content pane switches to it. (That last step is inferred
+  from the log, not observed directly — the visible case was not run.)
+
+  **Hence the move direction.** Moving the *browser* would bounce focus onto the browser.
+  Moving the *terminal* is a no-op in the common case, because the terminal is already the
+  focused window — it maps last (watcher: browser at t58, terminal at t61) and grabs focus
+  per §8. Same adjacency either way; only which row sits on top differs.
+
+  Residual: if the terminal is not last to map, or something else on ws9 was deliberately
+  focused in the intervening seconds, the move still yanks focus. The airtight version is
+  §8's focus-restore helper — capture focus before, restore after — which is the second
+  reason these two pieces of work should share machinery.
 - **Clean no-ops on failure.** A missing mark gives `{"success":false}` and moves nothing
   (verified against a live ws9 window, which stayed put); criteria matching no window gives
   `{"success":false,"error":"Given criteria don't match a window"}`. So an opportunistic
