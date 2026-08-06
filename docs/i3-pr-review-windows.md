@@ -70,6 +70,9 @@ makes it start working.
 - `--window-name` is honoured even when forwarded, and permanently overrides WM_NAME —
   the live ws9 windows still read `pr-review-requested` while sitting on PR pages. Full
   control of the title, but no live page title.
+- **The value lands in WM_NAME verbatim** — chromium appends no `" - Chromium"` suffix.
+  Verified against a live ws9 window, whose `name` was exactly the string passed. This is
+  what makes an end-anchored (`…$`) i3 title regex safe; see §7.
 - `--app=` verified: `--app=file:///tmp/claude-1000/i3lab/lab.html` → instance
   `tmp_claude-1000_i3lab_lab.html`, title `PR 46517 lab page`. For a PR URL expect
   something like `github.com__ignite-analytics_main_pull_46517` — **confirm at
@@ -193,24 +196,62 @@ Four steps, one commit each.
    `assign` rules need no further change — and unanchored i3 regexes match anywhere, so the
    existing rules already tolerate the longer title. It costs ~20 characters of a full-width
    row, which is affordable.
+   *(Superseded by step 5 — the prefix is what made the two rows unpairable by eye.)*
 4. **Per-window status dots.** Land the `title_format` work (§6). It only becomes useful once
    the rows are distinguishable, and stacking is what makes the dot visible.
+5. **Queue token moved to the end of the browser title** (§7). Both rows for a PR now open
+   with the same `<repo>#<n>`.
+6. **`no_focus` on the review windows** (§8), so a newly polled PR can't take the keyboard
+   while another one is being read.
 
-### Phase 2 (agreed, deliberately not implemented yet)
+### Phase 2 (still not implemented — but the objections below no longer hold)
 
 **Pair each PR's two rows by adjacency, not by nesting.** After both windows map, mark the
 terminal and move the browser to that mark:
 
     i3-msg '[instance="^prr-main-46517$"] mark --replace prr-main-46517'
-    i3-msg '[title="^pr-review-requested main#46517"] move container to mark prr-main-46517'
+    i3-msg '[class="^Chromium$" title="^main#46517 "] move container to mark prr-main-46517'
 
-Both commands are criteria-based, so neither steals focus. The pair then sits one keypress
-apart in the stack with both titles still fully rendered — which is the readable half of the
-tabbed-group idea without either of its two problems above.
+**Verified on a scratch workspace** (i3 4.25.1, four windows spawned interleaved
+`Aterm, Bterm, Aweb, Bweb` into one stacked container):
 
-Deferred because it needs a wait-for-map loop in `launch_review()` (the browser is spawned
-from `send_notification()`, so the two halves have to rendezvous), and the interleaving may
-well not be annoying enough in practice to justify that. Revisit after living with steps 1-4.
+- **Sibling adjacency, no nesting.** With a *leaf* target, `move container to mark` inserts
+  the container immediately **after** the mark in the target's parent. Result was
+  `stacked [ Aterm, Aweb, Bterm, Bweb ]` — one stacked container, four leaves, no new level.
+  §3's two objections (unreadable `T[…]` container decorations, groups nesting inside each
+  other) came from the `split v` variant, which is **not needed**. Both rows keep rendering
+  their own full titles, dots included.
+- **No focus steal.** The focused workspace and focused window were unchanged across two
+  mark+move pairs, exactly as §3 predicted for criteria-based commands.
+- **Clean no-ops on failure.** A missing mark gives `{"success":false}` and moves nothing
+  (verified against a live ws9 window, which stayed put); criteria matching no window gives
+  `{"success":false,"error":"Given criteria don't match a window"}`. So an opportunistic
+  pairing attempt on ws10 — where the authored PR's terminal may be long gone by the time
+  its review browser opens — costs nothing when the mark isn't there.
+
+Still needed to land it: a `pair_windows <repo> <number>` helper polling `i3-msg -t get_tree`
+until both windows exist (bounded, ~30s), launched with `setsid -f` so it is tied to neither
+`send_notification()`'s 30s dunstify block nor the poller's lifetime. Plus `i3-msg` in
+`start-pr-review.sh`'s `verify` list.
+
+Two things to get right:
+
+- **Never interpolate the PR title into an i3 criterion.** Criteria are PCRE and real titles
+  contain metacharacters — `refactor(PRO-2119)` is a live capture group. Only `<repo>#<n>` is
+  safe to interpolate, and it needs anchoring (`^main#46517 `) so `main#4651` can't match
+  `main#46517`.
+- **Since step 5, `^main#46517 ` matches the terminal too**, so the browser criterion must be
+  qualified with `class="^Chromium$"`.
+
+Remaining cost: the move reorders the ws9 stack. Focus is preserved, but rows shift if you
+happen to be reading ws9 at that second.
+
+**Cheaper alternative considered:** serialise the spawns — split `send_notification()` into
+`open_browser` + `notify`, wait for the browser to map, then `launch_review()`. Natural map
+order then pairs them with no i3 machinery at all. Rejected as insufficient: it only fixes
+ordering *within* one poller, and three pollers run concurrently, so cross-repo interleaving
+(a `dataform#239` row landing between the two `main#46729` rows) survives. Marks fix that;
+ordering does not.
 
 ## 5. Alternatives to the whole approach
 
@@ -261,8 +302,79 @@ Landed as step 4, in `scripts/claude-i3-notify.sh` and `scripts/claude-status-bl
 - Dots only cover claude windows; browser windows never get one. Phase 2's adjacency would
   put the flagged claude row next to its browser row.
 
+## 7. Queue token at the end of the browser title (landed)
+
+The two rows for one PR shared nothing at the start of their titles, so a stacked ws9 could
+not be read as pairs:
+
+    class pr-review-requested   ✳ main#46729 refactor(PRO-2119): initial setup as…
+    class Chromium              pr-review-requested main#46729 refactor(PRO-2119): initial…
+
+chromium's `--class` is dropped on the shared profile (§2), so the title is the browser's
+only routing signal and the queue token has to stay in it. Moving it to the **end** and
+anchoring the regexes with `$` gives both rows the same `<repo>#<n>` opening:
+
+    assign     [title="pr-review-requested$"] $ws9
+    assign     [title="pr-review-reviewed$"]  $ws10
+    for_window [title="pr-review-(requested|reviewed)$"] layout stacking
+
+Safe because `--window-name` reaches WM_NAME verbatim (§2) — nothing can be appended after
+the token, so the end anchor cannot drift. The `class="^pr-review-"` rules are untouched.
+
+Two accepted trade-offs:
+
+- **The token truncates on long titles.** The browser row already overflows 3440px. Routing
+  is unaffected (i3 matches WM_NAME, not the rendering) and the workspace already says which
+  queue it is, so this only costs a redundant visual cue.
+- **`^<repo>#<n>` now matches both windows.** Only matters for Phase 2 criteria, which must
+  add `class="^Chromium$"`.
+
+## 8. Focus: new review windows no longer steal it (landed)
+
+`no_focus [criteria]` exists in this i3 (4.25.1 — `cfg_no_focus` in the binary, with runtime
+messages `no_focus was set for con = %p, not setting focus` and `This is the first window on
+this workspace, ignoring no_focus`):
+
+    no_focus [class="^pr-review-"]
+    no_focus [title="pr-review-(requested|reviewed)$"]
+
+**It composes with the stacking from §3.** An unfocused child of a stacked container is drawn
+entirely behind the focused one, so a new arrival adds a title row and nothing else — the
+"spawn in the back" behaviour, with no scratchpad tricks.
+
+Scope of the problem, measured:
+
+- **Hidden workspaces were never affected.** On a scratch workspace with no output showing
+  it, the workspace's focus head stayed on the first window in *both* a control run and a
+  `no_focus` run. i3 simply does not move focus for windows mapping out of view.
+- **There is one output** (`DP-4`, 3440x1440), so ws9/ws10 are only ever visible while
+  standing on them. That is the only case `no_focus` changes — and the only case that was
+  ever annoying.
+- **Not measured: the visible case.** Testing it means parking the user on the test
+  workspace for ~20s of deliberate focus-stealing, which is worse than the bug. The code path
+  is the same `no_focus` check at manage time, and real use answers it on the next PR.
+
+Caveats:
+
+- **The first window on a workspace is always focused**, `no_focus` or not — i3 says so
+  explicitly. Desirable: switching to an empty ws9 still lands somewhere.
+- **`no_focus` covers map time, not activation.** If chromium later asks to be raised via
+  `_NET_ACTIVE_WINDOW`, the *global* `focus_on_window_activation` decides. It is unset here,
+  so the default `smart` applies, which **does** focus a window on a visible workspace. If
+  `no_focus` alone leaks, the escalation is `focus_on_window_activation urgent` — but that is
+  global and would also stop e.g. a Slack link from raising the browser. Only if needed.
+
+Unrelated, noticed while measuring: `i3` pins `workspace $ws9 output HDMI1` and `$ws10 output
+HDMI1`, an output that does not exist on this machine. Dead lines; i3 falls back to `DP-4`.
+
 ## Sandbox notes
 
+- The live config is `/home/amund/.dotfiles/i3` itself, not `/etc/i3/config` (which exists
+  and differs). Confirmed with `i3-msg -t get_version | jq -r .loaded_config_file_name` —
+  worth doing before editing, since neither `~/.config/i3/config` nor `~/.i3/config` exists.
+- Testing config directives (`no_focus`, `assign`, `for_window`) means editing that file and
+  running `i3-msg reload`; they are not accepted by the command parser at runtime. Validate
+  with `i3 -C -c <file>` first, and expect each reload to be a visible flicker on screen.
 - `i3-msg` is blocked in the sandbox: `Could not create socket: Operation not permitted`
   (the IPC socket lives under `/run/user/1000/i3/`). All probes needed
   `dangerouslyDisableSandbox: true`. Same finding as the dots report.
