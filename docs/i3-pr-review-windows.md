@@ -201,8 +201,9 @@ Four steps, one commit each.
    the rows are distinguishable, and stacking is what makes the dot visible.
 5. **Queue token moved to the end of the browser title** (§7). Both rows for a PR now open
    with the same `<repo>#<n>`.
-6. **`no_focus` on the review windows** (§8), so a newly polled PR can't take the keyboard
-   while another one is being read.
+6. **`no_focus` on the review windows** (§8). Landed, and verified to work at manage time —
+   but it does **not** solve the problem: both windows re-grab focus afterwards through two
+   other paths. See §8.
 
 ### Phase 2 (still not implemented — but the objections below no longer hold)
 
@@ -329,7 +330,7 @@ Two accepted trade-offs:
 - **`^<repo>#<n>` now matches both windows.** Only matters for Phase 2 criteria, which must
   add `class="^Chromium$"`.
 
-## 8. Focus: new review windows no longer steal it (landed)
+## 8. Focus: `no_focus` landed, but review windows still steal focus
 
 `no_focus [criteria]` exists in this i3 (4.25.1 — `cfg_no_focus` in the binary, with runtime
 messages `no_focus was set for con = %p, not setting focus` and `This is the first window on
@@ -350,19 +351,53 @@ Scope of the problem, measured:
 - **There is one output** (`DP-4`, 3440x1440), so ws9/ws10 are only ever visible while
   standing on them. That is the only case `no_focus` changes — and the only case that was
   ever annoying.
-- **Not measured: the visible case.** Testing it means parking the user on the test
-  workspace for ~20s of deliberate focus-stealing, which is worse than the bug. The code path
-  is the same `no_focus` check at manage time, and real use answers it on the next PR.
 
-Caveats:
+### It is necessary but NOT sufficient — both windows still steal focus
+
+Tested for real: dropped a PR from the seen-state, sat on ws9, and sampled the tree every
+0.5s while the poller re-fired it. Both new windows took focus anyway.
+
+`no_focus` itself is fine. `i3-dump-log` shows it doing its job for both windows:
+
+    manage.c:628   no_focus was set for con = 0x…cc10, not setting focus.   (chromium)
+    manage.c:628   no_focus was set for con = 0x…26a0, not setting focus.   (alacritty)
+
+They are then re-focused milliseconds later, by **two different post-map paths**:
+
+    # chromium — the activation caveat, as predicted
+    handlers.c:760   _NET_ACTIVE_WINDOW: Window 0x00e00661 should be activated
+    handlers.c:801   Focusing con = 0x…cc10
+
+    # alacritty — a separate mechanism entirely
+    handlers.c:411   window 0x07600003 wants to be stacked 0     <- XCB_STACK_MODE_ABOVE
+    handlers.c:431   Focusing con = 0x…26a0
+
+i3 honours a ConfigureRequest carrying `stack_mode = Above` as raise-and-focus.
+**`focus_on_window_activation` does not govern this path** — it only covers
+`_NET_ACTIVE_WINDOW` — and there is no other i3 directive for it. alacritty 0.17 exposes no
+setting to suppress the request either (`man 5 alacritty`: `window.position`,
+`window.dimensions`, `window.startup_mode` are the only related knobs, none relevant).
+
+So `focus_on_window_activation urgent|none` would fix **only the browser half**. The terminal
+half is not reachable from i3 config at all.
+
+Not established: the ConfigureRequest path also calls `workspace_show`, which logged
+`Not switching, already there` on both fires — but ws9 was visible both times, so whether it
+could pull focus *to* ws9 from another workspace is untested. Do not assume either way.
+
+**Decision: left as-is and documented.** `no_focus` stays, because it is correct and is a
+precondition for any fix; it just has no observable effect on its own today.
+
+If it becomes worth fixing, the option that covers both halves without a global side effect
+is a focus-restore helper: record the focused window before spawning, then have a detached
+helper wait for the review window and hand focus back *only if* focus landed on it. That is
+the same wait-for-map machinery Phase 2 needs, so the two should share it. Cost is a
+~200-500ms window where the new window holds focus.
+
+Other caveat, unrelated to the above:
 
 - **The first window on a workspace is always focused**, `no_focus` or not — i3 says so
   explicitly. Desirable: switching to an empty ws9 still lands somewhere.
-- **`no_focus` covers map time, not activation.** If chromium later asks to be raised via
-  `_NET_ACTIVE_WINDOW`, the *global* `focus_on_window_activation` decides. It is unset here,
-  so the default `smart` applies, which **does** focus a window on a visible workspace. If
-  `no_focus` alone leaks, the escalation is `focus_on_window_activation urgent` — but that is
-  global and would also stop e.g. a Slack link from raising the browser. Only if needed.
 
 Unrelated, noticed while measuring: `i3` pins `workspace $ws9 output HDMI1` and `$ws10 output
 HDMI1`, an output that does not exist on this machine. Dead lines; i3 falls back to `DP-4`.
@@ -372,6 +407,15 @@ HDMI1`, an output that does not exist on this machine. Dead lines; i3 falls back
 - The live config is `/home/amund/.dotfiles/i3` itself, not `/etc/i3/config` (which exists
   and differs). Confirmed with `i3-msg -t get_version | jq -r .loaded_config_file_name` —
   worth doing before editing, since neither `~/.config/i3/config` nor `~/.i3/config` exists.
+- **`i3-dump-log` is the tool for "the rule looks right but nothing happens".** i3 logs every
+  criteria match, every `no_focus` decision, and every focus change with its source file and
+  line, so it distinguishes "the rule never matched" from "the rule matched and something
+  else undid it" — which is exactly the §8 finding, and is not deducible from `get_tree`.
+  It needs no debug build or restart; the ring buffer is always on. Note line numbers in its
+  output shift between invocations as the buffer grows, so grep by content, not by offset.
+- To watch a spontaneous event (a poller firing), sample `i3-msg -t get_tree` on a timer into
+  a log and diff the focus field afterwards. Reconstructing it from the user's description
+  cost more round-trips than the watcher did.
 - Testing config directives (`no_focus`, `assign`, `for_window`) means editing that file and
   running `i3-msg reload`; they are not accepted by the command parser at runtime. Validate
   with `i3 -C -c <file>` first, and expect each reload to be a visible flicker on screen.
