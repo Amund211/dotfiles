@@ -326,6 +326,14 @@ assign [title="pr-review-reviewed$"] $ws10
 for_window [class="^pr-review-"] layout stacking
 for_window [title="pr-review-(requested|reviewed)$"] layout stacking
 
+# Don't let a newly polled PR steal focus while I'm reading another one on the same
+# workspace. Combined with the stacking above this also hides the new window entirely -
+# an unfocused child of a stacked container is drawn behind the focused one, so all it
+# costs is a title row. i3 always focuses the first window on a workspace regardless, so
+# switching to an empty ws9 still lands somewhere.
+no_focus [class="^pr-review-"]
+no_focus [title="pr-review-(requested|reviewed)$"]
+
 # Gamertime setup
 assign [class="^Minecraft Launcher$"] → number 1
 assign [class="^minecraft-launcher$"] → number 1
