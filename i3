@@ -308,12 +308,15 @@ exec --no-startup-id i3-msg "workspace $ws1"
 # assign pr review-requests to ws9, reviewed prs to ws10 (see docs/i3-pr-review-windows.md).
 # Review terminals match on WM_CLASS, which never changes, so their title stays free for
 # claude's --name. The browser windows have no settable class, so they keep matching on the
-# title prefix that pr-review.sh freezes with chromium --window-name.
+# title that pr-review.sh freezes with chromium --window-name - but the pr-review-<queue>
+# token sits at the *end* of it, so both rows for a PR start with the same <repo>#<number>
+# and read as a pair. --window-name lands in WM_NAME verbatim (chromium appends nothing),
+# so the end anchor cannot drift.
 assign [class="^pr-review-requested$"] $ws9
-assign [title="^pr-review-requested"] $ws9
+assign [title="pr-review-requested$"] $ws9
 
 assign [class="^pr-review-reviewed$"] $ws10
-assign [title="^pr-review-reviewed"] $ws10
+assign [title="pr-review-reviewed$"] $ws10
 
 # Stack the review workspaces so each window gets a full-width title row instead of an
 # Nth of one - a PR title is unreadable in a squished tab. The first matching window
@@ -321,7 +324,7 @@ assign [title="^pr-review-reviewed"] $ws10
 # stacked container. Both rules are needed: ws10 can receive a browser window with no
 # terminal alongside it.
 for_window [class="^pr-review-"] layout stacking
-for_window [title="^pr-review-"] layout stacking
+for_window [title="pr-review-(requested|reviewed)$"] layout stacking
 
 # Gamertime setup
 assign [class="^Minecraft Launcher$"] → number 1

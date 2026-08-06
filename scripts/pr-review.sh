@@ -449,8 +449,10 @@ send_notification() {
 	workspace="${5:-10}"
 
 	# --window-name freezes WM_NAME for the life of the window, so it has to carry the
-	# identifying information itself - the page title never gets through. It keeps the
-	# pr-review-<queue> prefix the i3 rules match on. See docs/i3-pr-review-windows.md.
+	# identifying information itself - the page title never gets through. It ends with the
+	# pr-review-<queue> token the i3 rules match on, so the browser row and the review
+	# terminal for the same PR open with the same <repo>#<number> and can be read as a
+	# pair. See docs/i3-pr-review-windows.md.
 	chromium --window-name="$window_title" --new-window "$url" >/dev/null 2>&1 &
 
 	ACTION="$(dunstify --action="default,Open" --timeout=30000 "$title" "$subtitle")"
@@ -582,7 +584,7 @@ check() {
 		title=$(echo "$line" | jq -r '.title')
 		author=$(echo "$line" | jq -r '.author.login')
 
-		send_notification "Review: $title" "Author: $author" "$url" "pr-review-requested $repo_name#$number $title" 9 &
+		send_notification "Review: $title" "Author: $author" "$url" "$repo_name#$number $title — pr-review-requested" 9 &
 		if [ -n "$claude_review" ]; then
 			launch_review "$number" "$url" "$title" 'pr-review-requested'
 		fi
@@ -615,7 +617,7 @@ check() {
 		title=$(echo "$line" | jq -r '.title')
 		author=$(echo "$line" | jq -r '.author.login')
 
-		send_notification "Merge: $title" "Author: $author" "$url" "pr-review-reviewed $repo_name#$number $title" 10 &
+		send_notification "Merge: $title" "Author: $author" "$url" "$repo_name#$number $title — pr-review-reviewed" 10 &
 	done
 }
 
