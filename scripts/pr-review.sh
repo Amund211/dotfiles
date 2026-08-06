@@ -508,7 +508,23 @@ launch_review() {
 	# which otherwise prompt in every fresh worktree.
 	# setsid puts the terminal in its own session rather than the poller's process group,
 	# so restarting or killing the poller cannot take a review session down with it.
+	# The -u list drops the environment a claude session stamps on its children: if the
+	# poller was started from inside one (restarting it by hand from a claude terminal is
+	# the normal case), the review claude inherits CLAUDE_CODE_CHILD_SESSION and turns off
+	# transcript saving, so those sessions can never be resumed. The rest are stale
+	# pointers at the parent - its session, pid, effort and sandbox proxy - that a fresh
+	# session sets for itself.
 	setsid -f env \
+		-u CLAUDE_CODE_CHILD_SESSION \
+		-u CLAUDE_CODE_SESSION_ID \
+		-u CLAUDE_PID \
+		-u CLAUDE_EFFORT \
+		-u CLAUDECODE \
+		-u CLAUDE_CODE_ENTRYPOINT \
+		-u CLAUDE_CODE_EXECPATH \
+		-u CLAUDE_CODE_HOST_HTTP_PROXY_PORT \
+		-u CLAUDE_CODE_HOST_SOCKS_PROXY_PORT \
+		-u AI_AGENT \
 		REVIEW_REPO="$repository_path" \
 		REVIEW_WORKTREE="$worktree_path" \
 		REVIEW_BRANCH="$branch" \
