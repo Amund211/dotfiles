@@ -17,6 +17,7 @@ set -- \
 	cloudscheduler-admin \
 	cloudsql-editor \
 	cloudtask-admin \
+	bigquery-user \
 	custom-cloud-storage-sign-url \
 	secret-version-adder \
 	errorreporting-user \
