@@ -11,7 +11,7 @@ usage() {
 	echo "Usage: $0 --repo <path> --user <github-name> [--claude-review] [--test]"
 	echo "  -r, --repo <path>   Local git repository to poll for PRs and base review worktrees on"
 	echo "  -u, --user <name>   Your GitHub username"
-	echo "      --claude-review Spin up a PR-head worktree + a 'claude /review' terminal for each hit"
+	echo "      --claude-review Spin up a PR-head worktree + a 'claude /code-review' terminal for each hit"
 	echo "  -t, --test          Run tests only"
 	echo "  -h, --help          Show this help"
 }
@@ -474,18 +474,26 @@ launch_review() {
 	url=$2
 	title=$3
 	window_class=$4
+	base_branch=$5
 
 	worktree_base="/tmp/claude-1000/pr-review-$repo_name"
 	worktree_path="$worktree_base/pr-$number"
 	branch="pr-review-$number"
 	pr_ref="refs/pr-review/$number"
+	base_ref="refs/pr-review/$number-base"
 
 	# Fetch the PR head into a dedicated per-PR ref (not the shared FETCH_HEAD, which
 	# a concurrent fetch in this repo could clobber) and build the worktree from it.
 	# The pr-review-<number> branch is uniquely named so it never collides with a
 	# branch checked out in the main repo. Clean any stale worktree from a prior run.
+	# The base branch gets its own per-PR ref for the same reason: the review range is
+	# pinned to SHAs resolved here, so master/origin/master moving in the main checkout
+	# later cannot change what the session ends up reviewing. Two fetches, not one with
+	# two refspecs, so a deleted base branch does not take the head fetch down with it.
 	mkdir -p "$worktree_base"
 	git -C "$repository_path" fetch origin "+refs/pull/$number/head:$pr_ref"
+	git -C "$repository_path" fetch origin "+refs/heads/$base_branch:$base_ref" ||
+		echo "pr-review: could not fetch base branch '$base_branch' for PR $number" >&2
 	git -C "$repository_path" worktree remove --force "$worktree_path" 2>/dev/null
 	rm -rf "$worktree_path"
 	git -C "$repository_path" worktree prune
@@ -495,7 +503,22 @@ launch_review() {
 		return 1
 	fi
 
-	prompt="$(printf '/review %s\n\nYou are in a throwaway git worktree on branch %s, checked out to this PR head; edit freely, it does not touch the main checkout.' "$url" "$branch")"
+	# Resolve the range now and hand claude the two SHAs, never ref names. A review
+	# session lives for hours; in that time the main checkout fetches and rebases, and
+	# refs the worktree shares with it (master, origin/master) move, which is how a
+	# session ends up reviewing code that has nothing to do with its PR. merge-base -
+	# not the base tip - is what gives the same three-dot diff GitHub shows.
+	head_sha="$(git -C "$repository_path" rev-parse --verify --quiet "$pr_ref^{commit}")"
+	base_sha="$(git -C "$repository_path" merge-base "$base_ref" "$pr_ref" 2>/dev/null)"
+
+	if [ -n "$base_sha" ] && [ -n "$head_sha" ]; then
+		diff_instructions="$(printf 'Review exactly this diff and nothing else:\n\n    git diff %s %s\n\n%s is the PR head this worktree is checked out to; %s is its merge-base with the PR base branch %s. Both were resolved when this worktree was created - use them verbatim, and do not name master, origin/master, HEAD~N or any other moving ref when you resolve the range.' "$base_sha" "$head_sha" "$head_sha" "$base_sha" "$base_branch")"
+	else
+		echo "pr-review: no merge-base for PR $number against '$base_branch', falling back to gh pr diff" >&2
+		diff_instructions="$(printf 'Review exactly the diff that "gh pr diff %s" prints, and nothing else. Do not derive a range from master, origin/master, HEAD~N or any other ref this worktree shares with the main checkout - they move while the review runs.' "$number")"
+	fi
+
+	prompt="$(printf '/code-review %s\n\n%s\n\nYou are in a throwaway git worktree on branch %s, checked out to this PR head; edit freely, it does not touch the main checkout.' "$url" "$diff_instructions" "$branch")"
 
 	# Reap the worktree/branch/ref once claude exits so they don't pile up and
 	# eventually fill /tmp (mirrors prune_review_state). Values go through env, not the
@@ -531,6 +554,7 @@ launch_review() {
 		REVIEW_WORKTREE="$worktree_path" \
 		REVIEW_BRANCH="$branch" \
 		REVIEW_REF="$pr_ref" \
+		REVIEW_BASE_REF="$base_ref" \
 		REVIEW_CLAUDE_NAME="$repo_name#$number $title" \
 		REVIEW_PROMPT="$prompt" \
 		alacritty \
@@ -543,6 +567,7 @@ rm -rf "$REVIEW_WORKTREE"
 git -C "$REVIEW_REPO" worktree prune
 git -C "$REVIEW_REPO" branch -D "$REVIEW_BRANCH" 2>/dev/null
 git -C "$REVIEW_REPO" update-ref -d "$REVIEW_REF" 2>/dev/null
+git -C "$REVIEW_REPO" update-ref -d "$REVIEW_BASE_REF" 2>/dev/null
 ' \
 		>/dev/null
 }
@@ -571,7 +596,7 @@ mark_seen() {
 }
 
 check() {
-	all_prs="$(gh pr list --search '-author:app/dependabot' --limit=30 --json url,title,author,createdAt,reviewRequests,reviews,number | jq -cr ".[] | select(.createdAt | fromdate > (now -3000000))")"
+	all_prs="$(gh pr list --search '-author:app/dependabot' --limit=30 --json url,title,author,createdAt,reviewRequests,reviews,number,baseRefName | jq -cr ".[] | select(.createdAt | fromdate > (now -3000000))")"
 
 	# Review requested from me -> browser + notification + claude review on ws9.
 	echo "$all_prs" | filter_review_requested "$my_github_name" | while read -r line; do
@@ -586,7 +611,8 @@ check() {
 
 		send_notification "Review: $title" "Author: $author" "$url" "$repo_name#$number $title — pr-review-requested" 9 &
 		if [ -n "$claude_review" ]; then
-			launch_review "$number" "$url" "$title" 'pr-review-requested'
+			base_branch=$(echo "$line" | jq -r '.baseRefName')
+			launch_review "$number" "$url" "$title" 'pr-review-requested' "$base_branch"
 		fi
 	done
 
@@ -601,8 +627,9 @@ check() {
 
 			number=$(echo "$line" | jq -r '.number')
 			title=$(echo "$line" | jq -r '.title')
+			base_branch=$(echo "$line" | jq -r '.baseRefName')
 
-			launch_review "$number" "$url" "$title" 'pr-review-reviewed'
+			launch_review "$number" "$url" "$title" 'pr-review-reviewed' "$base_branch"
 		done
 	fi
 
