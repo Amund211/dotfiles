@@ -29,6 +29,7 @@ set -- \
 	storage-insights \
 	storage-object-admin \
 	suprema-oslogin \
+	bastion-oslogin \
 	visionai-editor
 
 if [ -z "$entitlement" ]; then
