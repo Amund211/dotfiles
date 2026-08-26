@@ -12,24 +12,26 @@ fi
 
 # Valid entitlements
 set -- \
+	bastion-oslogin \
+	bigquery-studio \
+	bigquery-user \
 	cloudfunctions-developer \
 	cloudrun-developer \
 	cloudscheduler-admin \
 	cloudsql-editor \
 	cloudtask-admin \
-	bigquery-user \
+	cloudtranslate-user \
 	custom-cloud-storage-sign-url \
-	secret-version-adder \
-	errorreporting-user \
+	documentai-admin \
 	firebase-admin \
 	gke-production \
+	logging-config-writer \
 	monitoring-admin \
 	pubsub-editor \
 	redis-admin \
+	secret-version-adder \
 	storage-insights \
 	storage-object-admin \
-	suprema-oslogin \
-	bastion-oslogin \
 	visionai-editor
 
 if [ -z "$entitlement" ]; then
@@ -47,6 +49,7 @@ done
 
 if [ -z "$chosen_entitlement" ]; then
 	echo "Invalid entitlement '$entitlement'! Must be one of $*" >&2
+	exit 1
 fi
 
 if [ -z "$justification" ]; then
