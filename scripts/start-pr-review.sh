@@ -6,6 +6,10 @@
 # scripts/init.sh delegates here at login, so the command line exists in exactly one
 # place. Anything else that needs the pollers running must call this script rather than
 # copy the pr-review.sh invocation - a second copy is what this script exists to avoid.
+#
+# Run this outside the Claude Code sandbox. In it pgrep sees no processes, so the running
+# pollers look stopped: --restart stops nothing and starts a duplicate set, and the new
+# pollers inherit the sandbox network deny and poll uselessly forever.
 
 set -u
 
