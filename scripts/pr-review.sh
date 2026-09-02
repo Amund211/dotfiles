@@ -596,7 +596,7 @@ mark_seen() {
 }
 
 check() {
-	all_prs="$(gh pr list --search '-author:app/dependabot' --limit=30 --json url,title,author,createdAt,reviewRequests,reviews,number,baseRefName | jq -cr ".[] | select(.createdAt | fromdate > (now -3000000))")"
+	all_prs="$(gh pr list --search '-author:app/dependabot' --limit=100 --json url,title,author,createdAt,reviewRequests,reviews,number,baseRefName | jq -cr ".[] | select(.createdAt | fromdate > (now -3000000))")"
 
 	# Review requested from me -> browser + notification + claude review on ws9.
 	echo "$all_prs" | filter_review_requested "$my_github_name" | while read -r line; do
