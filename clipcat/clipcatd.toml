@@ -1,0 +1,53 @@
+daemonize = true
+pid_file = "/run/user/1000/clipcatd.pid"
+primary_threshold_ms = 5000
+max_history = 50
+clear_history_on_start = true
+synchronize_selection_with_clipboard = true
+
+# XDG_RUNTIME_DIR is tmpfs, so the history stays in RAM and dies with the
+# session. Set max_history to 0 to drop history entirely -- but that also stops
+# clipcatd holding a clip, which is what keeps the clipboard alive after the
+# source application exits.
+history_file_path = "/run/user/1000/clipcat/history"
+snippets = []
+
+[log]
+emit_journald = true
+emit_stdout = false
+emit_stderr = false
+level = "INFO"
+
+[watcher]
+enable_clipboard = true
+enable_primary = true
+enable_secondary = false
+sensitive_mime_types = ["x-kde-passwordManagerHint"]
+filter_text_min_length = 1
+filter_text_max_length = 20000000
+denied_text_regex_patterns = []
+capture_image = true
+filter_image_max_size = 5242880
+
+[grpc]
+# Local socket only, no TCP listener.
+enable_http = false
+enable_local_socket = true
+host = "127.0.0.1"
+port = 45045
+local_socket = "/run/user/1000/clipcat/grpc.sock"
+
+[dbus]
+enable = true
+
+[metrics]
+enable = false
+host = "127.0.0.1"
+port = 45047
+
+[desktop_notification]
+# Off: PRIMARY is watched, so every mouse selection would raise a dunst popup.
+enable = false
+icon = "accessories-clipboard"
+timeout_ms = 2000
+long_plaintext_length = 2000

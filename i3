@@ -60,6 +60,9 @@ exec --no-startup-id "xbanish -i mod4"
 # Start machine specific init script
 exec --no-startup-id "~/.dotfiles/scripts/init.sh"
 
+# clipboard manager: keeps the clipboard alive after the source window closes
+exec --no-startup-id "/usr/bin/clipcatd"
+
 
 ###############################################################
 #		       Window properties
@@ -109,7 +112,8 @@ bindsym XF86AudioMute exec --no-startup-id "pactl set-sink-mute @DEFAULT_SINK@ t
 # Toggle touchpad
 bindsym XF86TouchpadToggle exec --no-startup-id "~/.dotfiles/scripts/toggletouchpad.sh"
 
-# Screenshot
+# Screenshot. xclip stays here on purpose: xsel is text-only and cannot serve
+# image/png. clipcatd picks the image up from the clipboard either way.
 bindsym $mod+Print exec --no-startup-id "cd ~/screenshots && scrot --quality 100 -e 'cat $f | xclip -selection clipboard -t image/png'"
 
 # I would like to do `setxkbmap -option grab:break_actions` and then
@@ -152,6 +156,9 @@ bindsym $mod+Pause exec --no-startup-id "sudo systemctl restart NetworkManager"
 # Application bindings ########################################
 # start dmenu (a program launcher)
 bindsym $mod+d exec --no-startup-id dmenu_run
+
+# Clipboard history picker (dmenu). Super+c, not Ctrl+C -- copy/paste is untouched.
+bindsym $mod+c exec --no-startup-id "clipcat-menu insert"
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.

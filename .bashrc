@@ -31,8 +31,8 @@ alias p='sudo pacman'
 alias trim='sudo fstrim -A'
 alias h='$TERMINAL >/dev/null 2>/dev/null & disown $!'
 alias pw='watch -n 1 ping -c 1 8.8.8.8'
-alias clip='xclip -selection primary -o | xclip -selection clipboard'
-alias sel='xclip -selection clipboard -o | xclip -selection primary'
+alias clip='xsel -p -o | xsel -b -i'
+alias sel='xsel -b -o | xsel -p -i'
 alias nv='nvim'
 
 # Git stuff

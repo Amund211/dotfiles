@@ -151,6 +151,44 @@ EOF
 	create "Replaced $target with $tmpl_name (your previous version was backed up)"
 }
 
+# install_symlink <target> <source>
+# Points <target> at the tracked file in this repo. Used for formats with no
+# include mechanism (TOML), which cannot source the repo copy the way the
+# templates do.
+install_symlink() {
+	local target source shown
+	target="$1"
+	source="$2"
+	shown="${source#"$HOME"/}"
+
+	if [ ! -f "$source" ]; then
+		err "tracked file '$source' is missing; skipping $target"
+		return 0
+	fi
+
+	if [ -L "$target" ] && [ "$(readlink -f "$target")" = "$source" ]; then
+		skip "$target already links to $shown, nothing to do"
+		return 0
+	fi
+
+	if [ "$DRY_RUN" = 1 ]; then
+		if [ -e "$target" ] || [ -L "$target" ]; then
+			create "[dry-run] would back up $target and link it to $shown"
+		else
+			create "[dry-run] would link $target -> $shown"
+		fi
+		return 0
+	fi
+
+	mkdir -p "$(dirname "$target")"
+	if [ -e "$target" ] || [ -L "$target" ]; then
+		make_backup "$target"
+		rm "$target"
+	fi
+	ln -s "$source" "$target"
+	create "Linked $target -> $shown"
+}
+
 # remove_bash_profile
 # A ~/.bash_profile would shadow ~/.profile for login bash shells, so the
 # desired state is that it is absent. Remove it (backed up first) if present.
@@ -181,4 +219,6 @@ install_template "$HOME/.profile" "$REPO/templates/.profile"
 install_template "$HOME/.vimrc" "$REPO/templates/.vimrc"
 install_template "$HOME/.xinitrc" "$REPO/templates/.xinitrc"
 install_template "$HOME/.config/alacritty/alacritty.toml" "$REPO/templates/alacritty.toml"
+install_symlink "$HOME/.config/clipcat/clipcatd.toml" "$REPO/clipcat/clipcatd.toml"
+install_symlink "$HOME/.config/clipcat/clipcat-menu.toml" "$REPO/clipcat/clipcat-menu.toml"
 remove_bash_profile
