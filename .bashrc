@@ -200,6 +200,9 @@ unset magenta
 unset aqua
 
 if command -v zoxide &>/dev/null; then
+	# agent worktrees must never be jump targets: `main` is a substring of
+	# `agent-main`, so they compete with git/ignite/main on every `cd main`
+	export _ZO_EXCLUDE_DIRS="$HOME/git/ignite/agent-main:$HOME/git/ignite/agent-main/*"
 	eval "$(zoxide init bash --cmd zox)"
 	cd() {
 		zox "$@" && ls
@@ -231,7 +234,6 @@ mkdirc() {
 }
 
 agent-main() {
-	unset -f cd
 	(setsid git -C /home/amund/git/ignite/agent-main/main pull >/dev/null 2>&1 </dev/null &)
 	builtin cd ~/git/ignite/agent-main || exit 1
 }
