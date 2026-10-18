@@ -1,1 +1,8 @@
 # Included from ~/.config/pulse/default.pa, see templates/default.pa
+
+### Minecraft isolated: own sink so OBS records game audio on a separate track
+# Start the launcher with PULSE_SINK=minecraft_sink, java inherits it
+load-module module-null-sink sink_name=minecraft_sink
+update-sink-proplist minecraft_sink device.description="Minecraft sounds"
+# No sink= so the loopback follows the default output
+load-module module-loopback latency_msec=20 source=minecraft_sink.monitor
