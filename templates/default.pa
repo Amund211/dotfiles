@@ -1,0 +1,4 @@
+# ~/.config/pulse/default.pa
+# .include does not expand ~ or $HOME, so the paths are absolute
+.include /etc/pulse/default.pa
+.include /home/amund/.dotfiles/default.pa
