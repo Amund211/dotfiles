@@ -219,7 +219,12 @@ install_template "$HOME/.profile" "$REPO/templates/.profile"
 install_template "$HOME/.vimrc" "$REPO/templates/.vimrc"
 install_template "$HOME/.xinitrc" "$REPO/templates/.xinitrc"
 install_template "$HOME/.config/alacritty/alacritty.toml" "$REPO/templates/alacritty.toml"
-install_template "$HOME/.config/pulse/default.pa" "$REPO/templates/default.pa"
+# Home desktop only
+if [ "$(uname -n)" = miniluv ]; then
+	install_template "$HOME/.config/pulse/default.pa" "$REPO/templates/default.pa"
+else
+	skip "default.pa: not on miniluv"
+fi
 install_symlink "$HOME/.config/clipcat/clipcatd.toml" "$REPO/clipcat/clipcatd.toml"
 install_symlink "$HOME/.config/clipcat/clipcat-menu.toml" "$REPO/clipcat/clipcat-menu.toml"
 remove_bash_profile
