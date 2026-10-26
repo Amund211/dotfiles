@@ -69,15 +69,14 @@ label=/
 DIR=/
 interval=once
 
-# Network interface monitoring
+# Network interface monitoring, on the interface of the default route
 [iface]
-IFACE=wlo1
 color=#00FF00
 interval=once
 separator=false
 
+# All interfaces except lo. INTERFACE is inverted in bandwidth2: it excludes the interface.
 [bandwidth2]
-INTERFACE=wlo1
 REFRESH_TIME=1
 markup=pango
 interval=persist
@@ -91,13 +90,22 @@ separator=false
 markup=pango
 interval=persist
 
+# GPU usage
+[gpu-load]
+command=$HOME/.dotfiles/scripts/gpu-load.sh
+label=GPU 
+interval=10
+separator=false
+min_width=100% 100%
+
 [load_average]
 label=LOAD 
 interval=10
-separator=false
 
 # Temperature
 [temperature]
+# CPU chip on AMD or Intel; without it the first chip (here the NVMe SSD) is used
+SENSOR_CHIP=k10temp-* coretemp-*
 label=TEMP 
 interval=10
 
