@@ -4,7 +4,7 @@ export PATH="$HOME/bin:$HOME/.local/bin:$PATH:$HOME/go/bin:$HOME/.dotfiles/scrip
 export EDITOR='vim'
 export SUDO_EDITOR='vim'
 export VISUAL='vim'
-export TERMINAL='urxvt'
+export TERMINAL='alacritty'
 export BROWSER='firefox'
 
 export SCREENLOCKER='i3lock -e -c 112233'
