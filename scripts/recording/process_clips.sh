@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.3 2026-10-18
+# Version 1.4 2026-10-26
 #
 # History of the cut command:
 #   < 1.1       ffmpeg -i IN -map 0 -c copy -ss S -to E OUT
@@ -9,6 +9,7 @@
 #   1.2 2026-10-13  ffmpeg -ss S -to E -i IN -map 0 -c copy -avoid_negative_ts make_zero OUT
 #               Starts at last keyframe before S, timestamps from 0.
 #   1.3 2026-10-18  Clip keeps the container of the replay (mkv or mp4), and keeps mp4 track names.
+#   1.4 2026-10-26  VLC starts at 40s of the replay.
 
 set -eu
 
@@ -49,7 +50,8 @@ for replay_file in "$@"; do
 		[ -n "$name" ] && meta+=("-metadata:s:$i" "title=$name")
 		i=$((i + 1))
 	done < <(ffprobe -v error -show_entries stream_tags=name -of csv=p=0 "$replay_file")
-	vlc "$replay_file" >/dev/null 2>/dev/null &
+	# The action is usually near the end of the replay
+	vlc --start-time 40 "$replay_file" >/dev/null 2>/dev/null &
 	vlc_pid="$!"
 
 	keep_clip=''
