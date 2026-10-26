@@ -165,10 +165,10 @@ bindsym $mod+c exec --no-startup-id "clipcat-menu insert"
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
 # Show/hide dropdown terminal
-bindsym $mod+t exec --no-startup-id "[ $(i3-msg [instance='dropdownTerminal'] scratchpad show 2>/dev/null) = '[{\\"success\\":true}]' ] || $TERMINAL -name dropdownTerminal -e sh -c 'i3-msg [instance='dropdownTerminal'] focus; clear; $SHELL' &"
+bindsym $mod+t exec --no-startup-id "[ $(i3-msg [instance='dropdownTerminal'] scratchpad show 2>/dev/null) = '[{\\"success\\":true}]' ] || alacritty --class Alacritty,dropdownTerminal -e sh -c 'i3-msg [instance='dropdownTerminal'] focus; clear; $SHELL' &"
 
 # Show/hide dropdown python
-bindsym $mod+p exec --no-startup-id "[ $(i3-msg [instance='dropdownPython'] scratchpad show 2>/dev/null) = '[{\\"success\\":true}]' ] || $TERMINAL -name dropdownPython -e sh -c 'i3-msg [instance='dropdownPython'] focus; clear; python' &"
+bindsym $mod+p exec --no-startup-id "[ $(i3-msg [instance='dropdownPython'] scratchpad show 2>/dev/null) = '[{\\"success\\":true}]' ] || alacritty --class Alacritty,dropdownPython -e sh -c 'i3-msg [instance='dropdownPython'] focus; clear; python' &"
 
 # start a terminal
 bindsym $mod+Return exec --no-startup-id $TERMINAL
