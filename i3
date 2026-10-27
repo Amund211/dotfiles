@@ -348,3 +348,5 @@ assign [class="^discord$"] → number 2
 assign [class="^Minecraft 1.8.9$"] → number 3
 assign [instance="^prism$"] → number 4
 assign [class="^obs$"] → number 10
+
+gaps inner 10
