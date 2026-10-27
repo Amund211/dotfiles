@@ -85,29 +85,27 @@ interval=persist
 [cpu_usage2]
 LABEL=CPU 
 REFRESH_TIME=1
-min_width=CPU 100.00%
+min_width=CPU 99.99%
 separator=false
 markup=pango
 interval=persist
-
-# GPU usage
-[gpu-load]
-command=$HOME/.dotfiles/scripts/gpu-load.sh
-label=GPU 
-interval=10
-separator=false
-min_width=100% 100%
-
-[load_average]
-label=LOAD 
-interval=10
 
 # Temperature
 [temperature]
 # CPU chip on AMD or Intel; without it the first chip (here the NVMe SSD) is used
 SENSOR_CHIP=k10temp-* coretemp-*
-label=TEMP 
 interval=10
+separator=false
+
+[load_average]
+interval=10
+
+# GPU usage
+[gpu-load]
+command=$HOME/.dotfiles/scripts/gpu-load.sh
+label=GPU
+interval=10
+min_width=100% 100%
 
 # Battery indicator
 [battery]
