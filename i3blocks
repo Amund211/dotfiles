@@ -114,6 +114,11 @@ interval=10
 label=⚡ 
 interval=30
 
+# Uptime
+[uptime]
+command=uptime -p | tr ',' ' ' | cut -f1-3 -d' '
+interval=60
+
 # Date Time
 [time]
 command=date '+%Y-%m-%d %H:%M:%S'
