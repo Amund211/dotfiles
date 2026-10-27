@@ -106,6 +106,13 @@ augroup typescript
   autocmd FileType typescript,typescriptcommon,typescriptreact set expandtab shiftwidth=4 tabstop=4
 augroup END
 
+" Latex stuff
+let g:tex_flavor='latex'
+augroup latex
+  autocmd!
+  autocmd FileType tex set noexpandtab shiftwidth=4 tabstop=4
+augroup END
+
 
 " Misc
 
