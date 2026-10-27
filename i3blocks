@@ -69,12 +69,6 @@ label=/
 DIR=/
 interval=once
 
-# Network interface monitoring, on the interface of the default route
-[iface]
-color=#00FF00
-interval=once
-separator=false
-
 # All interfaces except lo. INTERFACE is inverted in bandwidth2: it excludes the interface.
 [bandwidth2]
 REFRESH_TIME=1
