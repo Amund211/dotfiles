@@ -37,6 +37,11 @@ if [ -f "$userresources" ]; then
 
 fi
 
+# Per-machine DPI, so the same font size gives the same physical size
+case "$(uname -n)" in
+ficdep) echo "Xft.dpi: 110" | xrdb -merge ;;
+esac
+
 if [ -f "$usermodmap" ]; then
     xmodmap "$usermodmap"
 fi
