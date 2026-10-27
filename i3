@@ -37,6 +37,8 @@ font pango:monospace 10.5
 # finds out, if available)
 bar {
         status_command i3blocks -c ~/.dotfiles/i3blocks
+        # monospace can resolve to Nimbus Mono PS, which sits high in the bar
+        font pango:Source Code Pro, monospace 10.5
 }
 
 # Setting bg-image
