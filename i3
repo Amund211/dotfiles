@@ -41,6 +41,7 @@ bar {
 
 # Setting bg-image
 exec --no-startup-id "feh --bg-fill ~/pics/bg.jpg --no-fehbg"
+# exec --no-startup-id "magick ~/pics/live_laugh_love_inverted.jpg -modulate 100,100,$(python -S -c 'import random;print(random.randrange(0,200))') ~/pics/live_laugh_love_inverted_modulated.jpg"
 
 # Set bg
 # exec_always --no-startup-id "feh --bg-scale ~/path/to/file"
@@ -87,7 +88,7 @@ for_window [instance="dropdownPython"] border pixel 2
 bindsym Control+F7 exec --no-startup-id "xdotool mousedown 3"
 
 # Blank the screen (brightness 0)
-bindsym XF86Display exec --no-startup-id "light -S 0"
+bindsym XF86Display exec --no-startup-id "xbacklight -set 0"
 
 # Update all of i3blocks
 bindsym $mod+Insert exec --no-startup-id "~/.dotfiles/scripts/updateBlocks.sh"
@@ -227,6 +228,8 @@ bindsym $mod+v split v
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
+# global fullscreen: across all monitors
+bindsym $mod+shift+f        fullscreen toggle global
 
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+s layout stacking
