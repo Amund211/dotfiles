@@ -97,9 +97,9 @@ interval=10
 # GPU usage
 [gpu-load]
 command=$HOME/.dotfiles/scripts/gpu-load.sh
-label=GPU
+label=GPU 
 interval=10
-min_width=100% 100%
+min_width=GPU 100% 100%
 
 # Battery indicator
 [battery]
