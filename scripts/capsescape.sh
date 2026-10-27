@@ -6,5 +6,5 @@
 setxkbmap -option caps:swapescape
 
 # Map the menu button to right super as well.
-xmodmap -e 'keycode 135 = Super_R NoSymbol Super_R'
+xmodmap -e 'keycode 135 = Super_R'
 #keycode 135 = Super_R NoSymbol Super_R
