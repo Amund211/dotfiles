@@ -5,7 +5,10 @@ export EDITOR='vim'
 export SUDO_EDITOR='vim'
 export VISUAL='vim'
 export TERMINAL='alacritty'
-export BROWSER='firefox'
+case "$(uname -n)" in
+ficdep | teledep) export BROWSER='chromium' ;;
+*) export BROWSER='firefox' ;;
+esac
 
 export SCREENLOCKER='i3lock -e -c 112233'
 
