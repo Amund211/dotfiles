@@ -42,8 +42,8 @@ case "$(uname -n)" in
 ficdep) echo "Xft.dpi: 110" | xrdb -merge ;;
 teledep)
     echo "Xft.dpi: 96" | xrdb -merge
-    # Keep Alacritty at its old 112 dpi size; only the rest shrinks
-    export WINIT_X11_SCALE_FACTOR=1.17
+    # Alacritty slightly larger than the rest (~104 dpi)
+    export WINIT_X11_SCALE_FACTOR=1.08
     ;;
 esac
 
