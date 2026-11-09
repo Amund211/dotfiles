@@ -19,8 +19,8 @@ also run `git branch -u origin/main` (it still tracks `origin/master`), and skip
 
 - [x] ficdep
 - [x] teledep
-- [ ] miniluv
+- [x] miniluv
 - [ ] minipax
-- [ ] miniplenty
+- [x] miniplenty
 - [ ] minitrue
 - [ ] recdep
