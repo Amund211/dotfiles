@@ -476,17 +476,22 @@ launch_review() {
 	window_class=$4
 	base_branch=$5
 
+	# A random id per launch, so a relaunch for the same PR (re-review) never shares a
+	# path, branch or ref with a window still open for it - that window's exit cleanup
+	# would otherwise delete the new session's worktree. Names keep the pr-review-*
+	# prefixes so prune_review_state and bulk cleanup still match them.
+	id="$number-$(od -An -N3 -tx1 /dev/urandom | tr -d ' \n')"
 	worktree_base="/tmp/claude-1000/pr-review-$repo_name"
-	worktree_path="$worktree_base/pr-$number"
-	branch="pr-review-$number"
-	pr_ref="refs/pr-review/$number"
-	base_ref="refs/pr-review/$number-base"
+	worktree_path="$worktree_base/pr-$id"
+	branch="pr-review-$id"
+	pr_ref="refs/pr-review/$id"
+	base_ref="refs/pr-review/$id-base"
 
-	# Fetch the PR head into a dedicated per-PR ref (not the shared FETCH_HEAD, which
+	# Fetch the PR head into a dedicated per-launch ref (not the shared FETCH_HEAD, which
 	# a concurrent fetch in this repo could clobber) and build the worktree from it.
-	# The pr-review-<number> branch is uniquely named so it never collides with a
-	# branch checked out in the main repo. Clean any stale worktree from a prior run.
-	# The base branch gets its own per-PR ref for the same reason: the review range is
+	# The pr-review-<id> branch is uniquely named so it never collides with a
+	# branch checked out in the main repo.
+	# The base branch gets its own per-launch ref for the same reason: the review range is
 	# pinned to SHAs resolved here, so master/origin/master moving in the main checkout
 	# later cannot change what the session ends up reviewing. Two fetches, not one with
 	# two refspecs, so a deleted base branch does not take the head fetch down with it.
@@ -494,8 +499,6 @@ launch_review() {
 	git -C "$repository_path" fetch origin "+refs/pull/$number/head:$pr_ref"
 	git -C "$repository_path" fetch origin "+refs/heads/$base_branch:$base_ref" ||
 		echo "pr-review: could not fetch base branch '$base_branch' for PR $number" >&2
-	git -C "$repository_path" worktree remove --force "$worktree_path" 2>/dev/null
-	rm -rf "$worktree_path"
 	git -C "$repository_path" worktree prune
 
 	if ! git -C "$repository_path" worktree add --force -B "$branch" "$worktree_path" "$pr_ref"; then
@@ -523,8 +526,9 @@ launch_review() {
 	# Reap the worktree/branch/ref once claude exits so they don't pile up and
 	# eventually fill /tmp (mirrors prune_review_state). Values go through env, not the
 	# sh -c string, so arbitrary PR titles/prompts can't break quoting. If the window is
-	# force-killed (SIGHUP) rather than exited, cleanup is skipped - the pre-add remove
-	# above and startup prune_review_state catch those leftovers.
+	# force-killed (SIGHUP) rather than exited, cleanup is skipped - startup
+	# prune_review_state reaps the branch/refs, and the dir stays until reboot (tmpfs) or
+	# a manual 'rm -rf /tmp/claude-1000/pr-review-*/pr-*' + 'git worktree prune'.
 	# --class is what i3 assigns on: WM_CLASS is set once at map time and never changes,
 	# unlike the title. Passing --title instead would also make alacritty ignore every
 	# later title change, so claude's --name would never reach the title bar. The instance
