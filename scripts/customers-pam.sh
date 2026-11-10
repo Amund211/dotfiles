@@ -22,7 +22,29 @@ if [ "$(project_id_from_tenant 'ignitekpis')" != 'ignite-ignitekpis-7f659168' ];
 	exit 1
 fi
 
-tenant="${1:-}"
+usage() {
+	cat <<'EOF'
+Usage: customers-pam.sh <tenant[,tenant...]> <justification> [duration]
+
+Request the 'bigquery-viewer' PAM grant on one or more tenant projects.
+
+  tenant         Tenant id. Separate multiple with commas.
+  justification  Reason for access. Quote it.
+  duration       Number ending in s, m or h. Default: 3600s.
+
+Example:
+  customers-pam.sh 'ignitekpis,demosales' 'Investigating X' 2h
+EOF
+}
+
+case "${1:-}" in
+-h | --help)
+	usage
+	exit 0
+	;;
+esac
+
+tenants="${1:-}"
 justification="${2:-}"
 duration="${3:-3600s}"
 
@@ -31,8 +53,8 @@ if [ $# -gt 3 ]; then
 	exit 1
 fi
 
-if [ -z "$tenant" ]; then
-	echo "Missing tenant as first argument!" >&2
+if [ -z "$tenants" ]; then
+	echo "Missing tenant(s) as first argument! Separate multiple with commas." >&2
 	exit 1
 fi
 
@@ -59,10 +81,25 @@ h)
 	;;
 esac
 
-echo "Requesting '$ENTITLEMENT' on '$tenant' for $duration with justification: '$justification'"
-gcloud pam grants create \
-	--entitlement="$ENTITLEMENT" \
-	--requested-duration="$duration" \
-	--justification="$justification" \
-	--location=global \
-	--project="$(project_id_from_tenant "$tenant")"
+failed=''
+set -f
+IFS=','
+for tenant in $tenants; do
+	unset IFS
+	[ -z "$tenant" ] && continue
+	echo "Requesting '$ENTITLEMENT' on '$tenant' for $duration with justification: '$justification'"
+	gcloud pam grants create \
+		--entitlement="$ENTITLEMENT" \
+		--requested-duration="$duration" \
+		--justification="$justification" \
+		--location=global \
+		--project="$(project_id_from_tenant "$tenant")" ||
+		failed="$failed $tenant"
+done
+unset IFS
+set +f
+
+if [ -n "$failed" ]; then
+	echo "Failed for:$failed" >&2
+	exit 1
+fi
