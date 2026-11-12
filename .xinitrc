@@ -39,7 +39,11 @@ fi
 
 # Per-machine DPI, so the same font size gives the same physical size
 case "$(uname -n)" in
-ficdep) echo "Xft.dpi: 110" | xrdb -merge ;;
+ficdep)
+    echo "Xft.dpi: 96" | xrdb -merge
+    # Alacritty keeps its 110 dpi size (110/96)
+    export WINIT_X11_SCALE_FACTOR=1.1458333
+    ;;
 teledep)
     echo "Xft.dpi: 96" | xrdb -merge
     # Alacritty slightly larger than the rest (~104 dpi)
