@@ -3,8 +3,3 @@
 # Claude Code also copies via xsel/xclip; the double write races and fails with "Failed to set new owner of XCB selection".
 [terminal]
 osc52 = "Disabled"
-
-[[keyboard.bindings]]
-key = "Return"
-mods = "Shift"
-chars = "\u001B\r"
