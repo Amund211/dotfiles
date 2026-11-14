@@ -237,3 +237,8 @@ agent-main() {
 	(setsid git -C /home/amund/git/ignite/agent-main/main pull >/dev/null 2>&1 </dev/null &)
 	builtin cd ~/git/ignite/agent-main || exit 1
 }
+
+overlay() {
+	(setsid git -C /home/amund/git/overlay/prism pull >/dev/null 2>&1 </dev/null &)
+	builtin cd ~/git/overlay || return 1
+}
