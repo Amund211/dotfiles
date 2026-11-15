@@ -12,6 +12,9 @@ esac
 
 export SCREENLOCKER='i3lock -e -c 112233'
 
+# Prism test setup
+export PRISM_TEST_FIXTURES_DIR="$HOME/git/overlay/test-fixtures"
+
 # Editor used by vite-plugin-react-click-to-component
 export LAUNCH_EDITOR="$HOME/.dotfiles/scripts/launch_editor.py"
 
