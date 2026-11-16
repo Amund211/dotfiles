@@ -1,0 +1,14 @@
+# Claude config
+/.claude/
+/.mcp.json
+
+# Sandbox-injected files (shell/editor configs mounted into the working tree)
+# .bashrc and .profile are tracked here, so they are not listed
+/.bash_profile
+/.gitconfig
+/.gitmodules
+/.idea
+/.ripgreprc
+/.vscode
+/.zprofile
+/.zshrc
