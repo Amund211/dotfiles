@@ -203,7 +203,7 @@ if command -v zoxide &>/dev/null; then
 	# agent worktrees must never be jump targets: `main` is a substring of
 	# `agent-main`, so they compete with git/ignite/main on every `cd main`
 	# overlay is the same kind of tree; use ~/git/prism for prism jumps
-	export _ZO_EXCLUDE_DIRS="$HOME/git/ignite/agent-main:$HOME/git/ignite/agent-main/*:$HOME/git/overlay:$HOME/git/overlay/*"
+	export _ZO_EXCLUDE_DIRS="$HOME/git/ignite/agent-main:$HOME/git/ignite/agent-main/*:$HOME/git/ignite/agent-dataform:$HOME/git/ignite/agent-dataform/*:$HOME/git/overlay:$HOME/git/overlay/*"
 	eval "$(zoxide init bash --cmd zox)"
 	cd() {
 		zox "$@" && ls
@@ -237,6 +237,11 @@ mkdirc() {
 agent-main() {
 	(setsid git -C /home/amund/git/ignite/agent-main/main pull >/dev/null 2>&1 </dev/null &)
 	builtin cd ~/git/ignite/agent-main || exit 1
+}
+
+agent-dataform() {
+	(setsid git -C /home/amund/git/ignite/agent-dataform/dataform pull >/dev/null 2>&1 </dev/null &)
+	builtin cd ~/git/ignite/agent-dataform || return 1
 }
 
 overlay() {
