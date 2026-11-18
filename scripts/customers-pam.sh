@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-ENTITLEMENT='bigquery-viewer'
+ENTITLEMENTS='bigquery-viewer'
 
 # ignite-{substring(tenant, 14)}-{substring(sha256(tenant), 8)}
 project_id_from_tenant() {
@@ -24,16 +24,17 @@ fi
 
 usage() {
 	cat <<'EOF'
-Usage: customers-pam.sh <tenant[,tenant...]> <justification> [duration]
+Usage: customers-pam.sh [-p] <tenant[,tenant...]> <justification> [duration]
 
 Request the 'bigquery-viewer' PAM grant on one or more tenant projects.
 
-  tenant         Tenant id. Separate multiple with commas.
-  justification  Reason for access. Quote it.
-  duration       Number ending in s, m or h. Default: 3600s.
+  -p, --playground  Also request 'bigquery-playground'.
+  tenant            Tenant id. Separate multiple with commas.
+  justification     Reason for access. Quote it.
+  duration          Number ending in s, m or h. Default: 3600s.
 
 Example:
-  customers-pam.sh 'ignitekpis,demosales' 'Investigating X' 2h
+  customers-pam.sh -p 'ignitekpis,demosales' 'Investigating X' 2h
 EOF
 }
 
@@ -41,6 +42,10 @@ case "${1:-}" in
 -h | --help)
 	usage
 	exit 0
+	;;
+-p | --playground)
+	ENTITLEMENTS="$ENTITLEMENTS bigquery-playground"
+	shift
 	;;
 esac
 
@@ -87,14 +92,16 @@ IFS=','
 for tenant in $tenants; do
 	unset IFS
 	[ -z "$tenant" ] && continue
-	echo "Requesting '$ENTITLEMENT' on '$tenant' for $duration with justification: '$justification'"
-	gcloud pam grants create \
-		--entitlement="$ENTITLEMENT" \
-		--requested-duration="$duration" \
-		--justification="$justification" \
-		--location=global \
-		--project="$(project_id_from_tenant "$tenant")" ||
-		failed="$failed $tenant"
+	for entitlement in $ENTITLEMENTS; do
+		echo "Requesting '$entitlement' on '$tenant' for $duration with justification: '$justification'"
+		gcloud pam grants create \
+			--entitlement="$entitlement" \
+			--requested-duration="$duration" \
+			--justification="$justification" \
+			--location=global \
+			--project="$(project_id_from_tenant "$tenant")" ||
+			failed="$failed $tenant/$entitlement"
+	done
 done
 unset IFS
 set +f
