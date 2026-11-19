@@ -239,7 +239,7 @@ agent-main() {
 	builtin cd ~/git/ignite/agent-main || exit 1
 }
 
-agent-dataform() {
+dataform() {
 	(setsid git -C /home/amund/git/ignite/agent-dataform/dataform pull >/dev/null 2>&1 </dev/null &)
 	builtin cd ~/git/ignite/agent-dataform || return 1
 }
